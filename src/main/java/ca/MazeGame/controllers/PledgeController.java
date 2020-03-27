@@ -1,5 +1,6 @@
 package ca.MazeGame.controllers;
 
+import ca.MazeGame.exception.ResourceNotFoundException;
 import ca.MazeGame.model.ApiBoardWrapper;
 import ca.MazeGame.model.ApiGameWrapper;
 import ca.MazeGame.model.Pledge;
@@ -67,7 +68,7 @@ Return 404 (File Not Found) if the requested game does not exist.
                 return apiGameWrapper;
             }
         }
-        throw new IllegalArgumentException();
+        throw new ResourceNotFoundException(String.format("gane number %d does not exist", gameId));
     }
 
 
@@ -79,7 +80,7 @@ Return 404 (File Not Found) if the requested game does not exist.
                 return apiGameWrapper.apiBoardWrapper;
             }
         }
-        throw new IllegalArgumentException();
+        throw new ResourceNotFoundException(String.format("board number %d does not exist", id));
     }
 
     @PostMapping("games/{id}/moves")
@@ -89,8 +90,10 @@ Return 404 (File Not Found) if the requested game does not exist.
         for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
             if(apiGameWrapper.gameNumber== gameId){
                 apiGameWrapper.move(newMove);
+                return;
             }
         }
+        throw new ResourceNotFoundException(String.format("game number %d does not exist", gameId));
     }
 
 

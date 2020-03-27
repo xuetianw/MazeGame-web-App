@@ -69,7 +69,6 @@ public class ApiGameWrapper {
         if (checkStepOnCats()) return;
 
         check_cheese_num();
-
     }
 
     private void check_cheese_num() {
