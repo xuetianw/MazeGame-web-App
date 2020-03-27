@@ -1,19 +1,8 @@
 package ca.MazeGame.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ApiLocationWrapper {
     public int x;
     public int y;
-
-    public enum Direction {
-        MOVE_LEFT,
-        MOVE_UP,
-        MOVE_RIGHT,
-        MOVE_DOWN,
-        NOT_MOVING
-    }
 
     public Direction previous_move = Direction.NOT_MOVING;
 

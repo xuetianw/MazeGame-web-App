@@ -21,16 +21,28 @@ public class ApiBoardWrapper {
     public ApiBoardWrapper() {
         boardWidth = 10;
         boardHeight = 10;
-        mouseLocation = new ApiLocationWrapper(3, 4);
-        cheeseLocation = new ApiLocationWrapper(4,5);
+        placeMouse();
+        placeCheese();
+        setVisibilityArray();
+        place_cat();
+        place_wall();
+    }
+
+    private void setVisibilityArray() {
         isVisible = new boolean[boardWidth][boardHeight];
         for (int i = 0; i < boardWidth; i++) {
             for (int j = 0; j < boardHeight; j++) {
                 isVisible[i][j] = true;
             }
         }
-        place_cat();
-        place_wall();
+    }
+
+    private void placeMouse() {
+        mouseLocation = new ApiLocationWrapper(3, 4);
+    }
+
+    private void placeCheese() {
+        cheeseLocation = new ApiLocationWrapper(4,5);
     }
 
     private void place_cat() {
