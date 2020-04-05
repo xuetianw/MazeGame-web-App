@@ -3,8 +3,8 @@ package ca.MazeGame.model;
 import ca.MazeGame.exception.BadRequestException;
 import ca.MazeGame.exception.InvalidMoveException;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 
 public class ApiGameWrapper {
@@ -25,14 +25,11 @@ public class ApiGameWrapper {
         gameNumber = id;
     }
 
-
-
-
     public void move(String new_move) {
         if (isGameLost || isGameWon) {
             throw new BadRequestException("game finished");
         }
-        ApiLocationWrapper newLocation;
+        ApiLocationWrapper targetLocation;
         ApiLocationWrapper mouseLocation = apiBoardWrapper.mouseLocation;
 
         if (new_move.equals("MOVE_CATS")) {
@@ -43,28 +40,27 @@ public class ApiGameWrapper {
 
         switch (new_move) {
             case "MOVE_LEFT":
-                newLocation = new ApiLocationWrapper(mouseLocation.x - 1, mouseLocation.y);
+                targetLocation = mouseLocation.getTargetLocation(Direction.MOVE_LEFT);
                 break;
             case "MOVE_UP":
-                newLocation = new ApiLocationWrapper(mouseLocation.x, mouseLocation.y - 1);
+                targetLocation = mouseLocation.getTargetLocation(Direction.MOVE_UP);
                 break;
             case "MOVE_RIGHT":
-                newLocation = new ApiLocationWrapper(mouseLocation.x + 1, mouseLocation.y);
+                targetLocation = mouseLocation.getTargetLocation(Direction.MOVE_RIGHT);
                 break;
             case "MOVE_DOWN":
-                newLocation = new ApiLocationWrapper(mouseLocation.x, mouseLocation.y + 1);
+                targetLocation = mouseLocation.getTargetLocation(Direction.MOVE_DOWN);
                 break;
             default:
-                throw new BadRequestException("not from other ways");
+                throw new BadRequestException("NoSuchMove");
         }
 
-
-        if (apiBoardWrapper.is_at_wall(newLocation)) {
+        if (apiBoardWrapper.is_at_wall(targetLocation)) {
             throw new InvalidMoveException("new location on the wall");
         }
 
-        mouseLocation.x = newLocation.x;
-        mouseLocation.y = newLocation.y;
+        mouseLocation.x = targetLocation.x;
+        mouseLocation.y = targetLocation.y;
 
         if (checkStepOnCats()) return;
 
@@ -98,53 +94,42 @@ public class ApiGameWrapper {
             if (catLoc.previous_move == Direction.NOT_MOVING) {
                 ApiLocationWrapper newLoc;
 
+                List<Direction> directions = ApiLocationWrapper.getPossibleMoves();
+                Collections.shuffle(directions);
+                Direction direction;
                 do {
-                    newLoc = findNextMove(catLoc);
-                } while (apiBoardWrapper.is_at_wall(newLoc) || newLoc.equals(apiBoardWrapper.cheeseLocation));
+                    direction = pickRandomMove(directions);
+                    newLoc = catLoc.getTargetLocation(direction);
+                    directions.remove(direction);
+                } while (isLocationOccupied(newLoc));
 
                 catLoc.x = newLoc.x;
                 catLoc.y = newLoc.y;
+                catLoc.previous_move = direction;
             } else {
-                ApiLocationWrapper newLoc;
-                if (catLoc.previous_move == Direction.MOVE_LEFT) {
-                    newLoc = new ApiLocationWrapper(catLoc.x - 1, catLoc.y);
-                } else if (catLoc.previous_move == Direction.MOVE_UP) {
-                    newLoc = new ApiLocationWrapper(catLoc.x, catLoc.y - 1);
-                } else if (catLoc.previous_move == Direction.MOVE_RIGHT) {
-                    newLoc = new ApiLocationWrapper(catLoc.x + 1, catLoc.y);
-                } else {
-                    newLoc = new ApiLocationWrapper(catLoc.x, catLoc.y + 1);
+                ApiLocationWrapper targetLocation;
+                targetLocation = catLoc.getTargetLocation(catLoc.previous_move);
+                List<Direction> directions = ApiLocationWrapper.getPossibleMoves();
+                Collections.shuffle(directions);
+                directions.remove(catLoc.previous_move);
+                Direction direction;
+                while (isLocationOccupied(targetLocation)) {
+                    direction = pickRandomMove(directions);
+                    directions.remove(direction);
+                    targetLocation = catLoc.getTargetLocation(direction);
+                    catLoc.previous_move = direction;
                 }
-                while (apiBoardWrapper.is_at_wall(newLoc) || newLoc.equals(apiBoardWrapper.cheeseLocation)) {
-                    newLoc = findNextMove(catLoc);
-                }
-                catLoc.x = newLoc.x;
-                catLoc.y = newLoc.y;
+                catLoc.x = targetLocation.x;
+                catLoc.y = targetLocation.y;
             }
         }
-
     }
 
-    private ApiLocationWrapper findNextMove(ApiLocationWrapper catLoc) {
-        ApiLocationWrapper newLoc;// create instance of Random class
-        Random rand = new Random(System.currentTimeMillis());
+    private boolean isLocationOccupied(ApiLocationWrapper newLoc) {
+        return apiBoardWrapper.is_at_wall(newLoc) || newLoc.equals(apiBoardWrapper.cheeseLocation);
+    }
 
-        // Generate random integers in range 0 to 999
-        int rand_int1 = rand.nextInt(4); // numbers generated [0,1,2,3]
-
-        if (rand_int1 == 0) {
-            newLoc = new ApiLocationWrapper(catLoc.x - 1, catLoc.y);
-            catLoc.previous_move = Direction.MOVE_LEFT;
-        } else if (rand_int1 == 1) {
-            newLoc = new ApiLocationWrapper(catLoc.x, catLoc.y - 1);
-            catLoc.previous_move = Direction.MOVE_UP;
-        } else if (rand_int1 == 2) {
-            newLoc = new ApiLocationWrapper(catLoc.x + 1, catLoc.y);
-            catLoc.previous_move = Direction.MOVE_RIGHT;
-        } else {
-            newLoc = new ApiLocationWrapper(catLoc.x, catLoc.y + 1);
-            catLoc.previous_move = Direction.MOVE_DOWN;
-        }
-        return newLoc;
+    private Direction pickRandomMove(List<Direction> directions) {
+        return directions.get(0);
     }
 }

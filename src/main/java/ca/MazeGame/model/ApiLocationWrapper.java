@@ -1,5 +1,11 @@
 package ca.MazeGame.model;
 
+import ca.MazeGame.exception.BadRequestException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class ApiLocationWrapper {
     public int x;
     public int y;
@@ -36,5 +42,28 @@ public class ApiLocationWrapper {
 
         ApiLocationWrapper other = (ApiLocationWrapper) o;
         return x == other.x && y == other.y;
+    }
+
+    public ApiLocationWrapper getTargetLocation(Direction direction) {
+        switch (direction) {
+            case MOVE_LEFT:
+                return new ApiLocationWrapper(x - 1, y);
+            case MOVE_UP:
+                return new ApiLocationWrapper(x, y - 1);
+            case MOVE_RIGHT:
+                return new ApiLocationWrapper(x + 1, y);
+            case MOVE_DOWN:
+                return new ApiLocationWrapper(x, y + 1);
+            default:
+                throw new BadRequestException("not from other ways");
+        }
+    }
+    public static List<Direction> getPossibleMoves() {
+        List<Direction> list = new ArrayList<>();
+        list.add(Direction.MOVE_LEFT);
+        list.add(Direction.MOVE_UP);
+        list.add(Direction.MOVE_RIGHT);
+        list.add(Direction.MOVE_DOWN);
+        return list;
     }
 }
