@@ -1,6 +1,8 @@
 package ca.MazeGame.model;
 
 import ca.MazeGame.exception.BadRequestException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,7 +104,13 @@ public class MazeGame {
     }
 
     private void placeCatsOnBoard() {
-        cats.add(new Cat(this, new CellLocation(3, 3)));
+        cats.clear();
+        CellLocation cat;
+        do {
+            cat = maze.getRandomLocationInsideMaze();
+        } while (isMouseAtLocation(cheeseLocation)
+                || maze.isCellAWall(cheeseLocation));
+        cats.add(new Cat(this, cat));
     }
 
     private void placeNewCheeseOnBoard() {
@@ -115,7 +123,6 @@ public class MazeGame {
     public boolean isMouseAtLocation(CellLocation cell) {
         return playerLocation.equals(cell);
     }
-
     public void moveCat() {
         for (Cat cat : cats) {
             cat.doMove();

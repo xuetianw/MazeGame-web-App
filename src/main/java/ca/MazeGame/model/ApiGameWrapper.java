@@ -2,6 +2,8 @@ package ca.MazeGame.model;
 
 import ca.MazeGame.exception.BadRequestException;
 import ca.MazeGame.exception.InvalidMoveException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.swing.*;
 import java.io.File;

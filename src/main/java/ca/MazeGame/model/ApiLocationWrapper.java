@@ -2,10 +2,7 @@ package ca.MazeGame.model;
 
 import ca.MazeGame.exception.BadRequestException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ApiLocationWrapper {
     public int x;
@@ -30,10 +27,10 @@ public class ApiLocationWrapper {
         List<ApiLocationWrapper> locations = new ArrayList<>();
 
         // Populate this object!
-
-        for (CellLocation t : cells)
-            locations.add(makeFromCellLocation(t));
-
+        Iterator<CellLocation> iterator = cells.iterator();
+        while (iterator.hasNext()) {
+            locations.add(makeFromCellLocation(iterator.next()));
+        }
         return locations;
     }
 
