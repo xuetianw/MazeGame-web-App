@@ -15,6 +15,9 @@ public class MazeGame {
     private static int boardHeight = 10;
     private final Maze maze = new Maze(boardWidth, boardHeight);
 
+    private CellLocation cheeseLocation;
+    public static CellLocation playerLocation;
+
 
     public CellLocation getCheeseLocation() {
         return cheeseLocation;
@@ -24,7 +27,6 @@ public class MazeGame {
         this.cheeseLocation = cheeseLocation;
     }
 
-    private CellLocation cheeseLocation;
 
 
     public int getNumCheeseCollected() {
@@ -56,7 +58,6 @@ public class MazeGame {
         return boardHeight;
     }
 
-    public static CellLocation playerLocation = new CellLocation(3, 4);
 
     public static List<Cat> getCats() {
         return cats;
@@ -70,9 +71,14 @@ public class MazeGame {
 
 
     public MazeGame() {
+        placePlayer();
         placeNewCheeseOnBoard();
         placeCatsOnBoard();
         setVisibleAroundPlayerCell();
+    }
+
+    private void placePlayer() {
+        playerLocation = new CellLocation(1, 1);
     }
 
     private void setVisibleAroundPlayerCell() {
@@ -100,7 +106,14 @@ public class MazeGame {
     }
 
     private void placeNewCheeseOnBoard() {
-        cheeseLocation = new CellLocation(4, 5);
+        do {
+            cheeseLocation = maze.getRandomLocationInsideMaze();
+        } while (isMouseAtLocation(cheeseLocation)
+                || maze.isCellAWall(cheeseLocation));
+    }
+
+    public boolean isMouseAtLocation(CellLocation cell) {
+        return playerLocation.equals(cell);
     }
 
     public void moveCat() {

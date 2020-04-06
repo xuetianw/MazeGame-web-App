@@ -1,5 +1,6 @@
 package ca.MazeGame.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ca.MazeGame.exception.BadRequestException;
@@ -48,7 +49,11 @@ public class ApiBoardWrapper {
     }
 
     private void place_cat() {
-        catLocations = ApiLocationWrapper.makeFromCellLocations(MazeGame.getCats());
+        List<CellLocation> locations = new ArrayList<>();
+        for (Cat cat : MazeGame.getCats()) {
+            locations.add(cat.getLocation());
+        }
+        catLocations = ApiLocationWrapper.makeFromCellLocations(locations);
     }
 
     private void place_wall() {

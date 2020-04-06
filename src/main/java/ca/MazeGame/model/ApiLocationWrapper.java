@@ -26,10 +26,14 @@ public class ApiLocationWrapper {
         return location;
     }
     // MAY NEED TO CHANGE PARAMETERS HERE TO SUITE YOUR PROJECT
-    public static List<ApiLocationWrapper> makeFromCellLocations(List<Cat> cells) {
+    public static List<ApiLocationWrapper> makeFromCellLocations(Iterable<CellLocation> cells) {
         List<ApiLocationWrapper> locations = new ArrayList<>();
 
         // Populate this object!
+
+        for (CellLocation t : cells)
+            locations.add(makeFromCellLocation(t));
+
         return locations;
     }
 
