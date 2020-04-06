@@ -48,4 +48,14 @@ public class CellLocation {
                 throw new BadRequestException("not from other ways");
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o.getClass() != CellLocation.class) {
+            return false;
+        }
+
+        CellLocation other = (CellLocation) o;
+        return x == other.x && y == other.y;
+    }
 }

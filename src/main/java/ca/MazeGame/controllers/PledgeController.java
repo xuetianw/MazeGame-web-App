@@ -21,7 +21,6 @@ public class PledgeController {
     private List<ApiGameWrapper> apiGameWrappers = new ArrayList<>();
 
 
-
     @GetMapping("about")
     public String getHelloMessage() {
         return "Hello from Fred Wu!";
