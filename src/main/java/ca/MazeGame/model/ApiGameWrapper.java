@@ -3,8 +3,13 @@ package ca.MazeGame.model;
 import ca.MazeGame.exception.BadRequestException;
 import ca.MazeGame.exception.InvalidMoveException;
 
+import javax.swing.*;
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
+
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.showMessageDialog;
 
 
 public class ApiGameWrapper {
@@ -14,122 +19,86 @@ public class ApiGameWrapper {
     public int numCheeseFound;
     public int numCheeseGoal;
     public Long gameNumber;
+    public MazeGame game;
     public ApiBoardWrapper apiBoardWrapper;
 
-    public ApiGameWrapper(long id) {
-        isGameWon = false;
-        isGameLost = false;
-        numCheeseFound = 0;
-        numCheeseGoal = 1;
-        apiBoardWrapper = new ApiBoardWrapper();
+    public ApiGameWrapper(MazeGame game, long id) {
+        apiBoardWrapper = new ApiBoardWrapper(game);
+        this.game = game;
         gameNumber = id;
     }
 
-    public void move(String new_move) {
-        if (isGameLost || isGameWon) {
-            throw new BadRequestException("game finished");
-        }
-        ApiLocationWrapper targetLocation;
-        ApiLocationWrapper mouseLocation = apiBoardWrapper.mouseLocation;
+    public ApiGameWrapper(boolean isGameWon, boolean isGameLost, int numCheeseFound, int numCheeseGoal, Long gameNumber, MazeGame game) {
+        this.isGameWon = isGameWon;
+        this.isGameLost = isGameLost;
+        this.numCheeseFound = numCheeseFound;
+        this.numCheeseGoal = numCheeseGoal;
+        this.gameNumber = gameNumber;
+        this.game = game;
+    }
 
-        if (new_move.equals("MOVE_CATS")) {
-            moveCat();
-            if (checkStepOnCats()) return;
+
+    public void move(String newMove) {
+        if (newMove.equals("MOVE_CATS")) {
+            game.moveCat();
+            doWonOrLost();
             return;
         }
+        doPlayerMove(newMove);
+    }
 
-        switch (new_move) {
+    public void doPlayerMove(String arrow) {
+        Direction move = Direction.NOT_MOVING;
+        move = getPlayerMove(arrow);
+        if (!game.isValidPlayerMove(move)) {
+            throw new InvalidMoveException("new location on the wall");
+        } else {
+            game.recordPlayerMove(move);
+            if (!gameNotWonOrLost()) {
+//                System.out.println("Cats won!");
+                doWonOrLost();
+            }
+        }
+    }
+
+    Direction getPlayerMove(String newMove) {
+        switch (newMove) {
             case "MOVE_LEFT":
-                targetLocation = mouseLocation.getTargetLocation(Direction.MOVE_LEFT);
-                break;
+                return Direction.MOVE_LEFT;
             case "MOVE_UP":
-                targetLocation = mouseLocation.getTargetLocation(Direction.MOVE_UP);
-                break;
+                return Direction.MOVE_UP;
             case "MOVE_RIGHT":
-                targetLocation = mouseLocation.getTargetLocation(Direction.MOVE_RIGHT);
-                break;
+                return Direction.MOVE_RIGHT;
             case "MOVE_DOWN":
-                targetLocation = mouseLocation.getTargetLocation(Direction.MOVE_DOWN);
-                break;
+                return Direction.MOVE_DOWN;
             default:
                 throw new BadRequestException("NoSuchMove");
         }
-
-        if (apiBoardWrapper.is_at_wall(targetLocation)) {
-            throw new InvalidMoveException("new location on the wall");
-        }
-
-        mouseLocation.x = targetLocation.x;
-        mouseLocation.y = targetLocation.y;
-
-        if (checkStepOnCats()) return;
-
-        check_cheese_num();
+    }
+    public boolean gameNotWonOrLost() {
+        return !game.hasUserWon() && !game.hasUserLost();
     }
 
-    private void check_cheese_num() {
-        ApiLocationWrapper mouseLocation = apiBoardWrapper.mouseLocation;
-        if (mouseLocation.equals(apiBoardWrapper.cheeseLocation)) {
-            numCheeseFound++;
-            if (numCheeseFound == numCheeseGoal) {
-                isGameWon = true;
-            }
+    private void doWonOrLost() {
+        if (game.hasUserWon()) {
+            revealBoard();
+        } else if (game.hasUserLost()) {
+			revealBoard();
+        } else {
+            assert false;
         }
     }
-
-    private boolean checkStepOnCats() {
-        List<ApiLocationWrapper> catLocations = apiBoardWrapper.catLocations;
-        for (ApiLocationWrapper catLocationWrapper : catLocations) {
-            if(catLocationWrapper.equals(apiBoardWrapper.mouseLocation)) {
-                isGameLost = true;
-                return true;
-            }
-        }
-        return false;
+    public void revealBoard() {
+        game.displayBoard();
     }
 
-    private void moveCat() {
-        List<ApiLocationWrapper> newCatLocList = apiBoardWrapper.catLocations;
-        for (ApiLocationWrapper catLoc : newCatLocList) {
-            if (catLoc.previous_move == Direction.NOT_MOVING) {
-                ApiLocationWrapper newLoc;
-
-                List<Direction> directions = ApiLocationWrapper.getPossibleMoves();
-                Collections.shuffle(directions);
-                Direction direction;
-                do {
-                    direction = pickRandomMove(directions);
-                    newLoc = catLoc.getTargetLocation(direction);
-                    directions.remove(direction);
-                } while (isLocationOccupied(newLoc));
-
-                catLoc.x = newLoc.x;
-                catLoc.y = newLoc.y;
-                catLoc.previous_move = direction;
-            } else {
-                ApiLocationWrapper targetLocation;
-                targetLocation = catLoc.getTargetLocation(catLoc.previous_move);
-                List<Direction> directions = ApiLocationWrapper.getPossibleMoves();
-                Collections.shuffle(directions);
-                directions.remove(catLoc.previous_move);
-                Direction direction;
-                while (isLocationOccupied(targetLocation)) {
-                    direction = pickRandomMove(directions);
-                    directions.remove(direction);
-                    targetLocation = catLoc.getTargetLocation(direction);
-                    catLoc.previous_move = direction;
-                }
-                catLoc.x = targetLocation.x;
-                catLoc.y = targetLocation.y;
-            }
-        }
-    }
-
-    private boolean isLocationOccupied(ApiLocationWrapper newLoc) {
-        return apiBoardWrapper.is_at_wall(newLoc) || newLoc.equals(apiBoardWrapper.cheeseLocation);
-    }
-
-    private Direction pickRandomMove(List<Direction> directions) {
-        return directions.get(0);
+    public ApiGameWrapper processMaze() {
+        isGameWon = game.hasUserWon();
+        isGameLost = game.hasUserLost();
+        numCheeseFound = game.getNumCheeseCollected();
+        numCheeseGoal = MazeGame.getNumCheeseToCollect();
+        gameNumber = gameNumber;
+        game = game;
+        return new ApiGameWrapper(isGameWon, isGameLost, numCheeseFound, numCheeseGoal, gameNumber, game);
     }
 }

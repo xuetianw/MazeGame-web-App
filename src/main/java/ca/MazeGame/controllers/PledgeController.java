@@ -3,6 +3,7 @@ package ca.MazeGame.controllers;
 import ca.MazeGame.exception.ResourceNotFoundException;
 import ca.MazeGame.model.ApiBoardWrapper;
 import ca.MazeGame.model.ApiGameWrapper;
+import ca.MazeGame.model.MazeGame;
 import ca.MazeGame.model.Pledge;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +37,10 @@ public class PledgeController {
     @PostMapping("/games")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiGameWrapper postNewgame() {
-        ApiGameWrapper apiGameWrapper = new ApiGameWrapper(nextId.incrementAndGet());
+        MazeGame mazeGame = new MazeGame();
+        ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, nextId.incrementAndGet());
         apiGameWrappers.add(apiGameWrapper);
-        return apiGameWrapper;
+        return apiGameWrapper.processMaze();
     }
 
     /*
@@ -65,7 +67,7 @@ Return 404 (File Not Found) if the requested game does not exist.
     public ApiGameWrapper getGames(@PathVariable("id") long gameId) {
         for (ApiGameWrapper apiGameWrapper : apiGameWrappers) {
             if (apiGameWrapper.gameNumber == gameId) {
-                return apiGameWrapper;
+                return apiGameWrapper.processMaze();
             }
         }
         throw new ResourceNotFoundException(String.format("gane number %d does not exist", gameId));
@@ -77,7 +79,7 @@ Return 404 (File Not Found) if the requested game does not exist.
     public ApiBoardWrapper getBoard(@PathVariable("id") int id) {
         for (ApiGameWrapper apiGameWrapper : apiGameWrappers) {
             if (apiGameWrapper.gameNumber == id) {
-                return apiGameWrapper.apiBoardWrapper;
+                return apiGameWrapper.apiBoardWrapper.processMaze();
             }
         }
         throw new ResourceNotFoundException(String.format("board number %d does not exist", id));
