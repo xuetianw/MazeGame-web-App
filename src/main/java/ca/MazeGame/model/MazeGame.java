@@ -11,8 +11,8 @@ public class MazeGame implements Runnable {
     public static final int NUM_CHEESE_TO_COLLECT = 1;
     private int numCheeseCollected;
 
-    private static int boardWidth = 20;
-    private static int boardHeight = 20;
+    private static int boardWidth = 15;
+    private static int boardHeight = 15;
     private final Maze maze = new Maze(boardWidth, boardHeight);
 
     private CellLocation cheeseLocation;
@@ -120,7 +120,7 @@ public class MazeGame implements Runnable {
         return playerLocation.equals(cell);
     }
     public void moveCat() {
-        System.out.println("cat moved\n");
+//        System.out.println("cat moved\n");
         for (Cat cat : cats) {
             cat.doMove();
         }
