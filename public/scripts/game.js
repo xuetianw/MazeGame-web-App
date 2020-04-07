@@ -5,7 +5,7 @@ const myAppObj = new Vue({
     el: "#gameApp",
     data: {
         authorName: "(waiting for server...)",
-        playersTurn: true,
+        // playersTurn: true,
         game: null,
         board: null,
     },
@@ -48,6 +48,9 @@ window.addEventListener('keydown', function(e) {
 // Refresh UI at start
 $(document).ready(function() {
     loadAbout();
+    window.setInterval(function () {
+        loadGameBoard()
+    }, 1000);
 });
 
 function loadAbout() {
@@ -68,7 +71,7 @@ function makeNewGame() {
         .then(function (response) {
             console.log("POST new game returned:", response);
             myAppObj.game = response.data;
-            myAppObj.playersTurn = true;
+            // myAppObj.playersTurn = true;
             loadGameBoard();
 
             alertOnWrongStatus("POST games", 201, response.status);
@@ -144,10 +147,10 @@ function sendMoveCats() {
 }
 
 function sendMove(directionStr) {
-    if (!myAppObj.playersTurn) {
-        console.log("Not player's turn yet! Cats must move.");
-        return;
-    }
+    // if (!myAppObj.playersTurn) {
+    //     console.log("Not player's turn yet! Cats must move.");
+    //     return;
+    // }
 
     if (myAppObj.game.isGameLost || myAppObj.game.isGameWon) {
         console.log("Unable to make move after game has ended.");
@@ -161,8 +164,8 @@ function sendMove(directionStr) {
             loadGame();
 
             // Cats go next, after a moment
-            myAppObj.playersTurn = false;
-            setTimeout(sendMoveCats, 100);
+            // myAppObj.playersTurn = false;
+            // setTimeout(sendMoveCats, 100);
             alertOnWrongStatus("POST Mouse Move", 202, response.status);
         })
         .catch(function (error) {
