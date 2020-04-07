@@ -7,14 +7,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MazeGame {
-    public static final boolean isGameWon = false;
-    public static final boolean isGameLost = false;
+public class MazeGame implements Runnable {
     public static final int NUM_CHEESE_TO_COLLECT = 1;
     private int numCheeseCollected;
 
-    private static int boardWidth = 10;
-    private static int boardHeight = 10;
+    private static int boardWidth = 20;
+    private static int boardHeight = 20;
     private final Maze maze = new Maze(boardWidth, boardHeight);
 
     private CellLocation cheeseLocation;
@@ -28,8 +26,6 @@ public class MazeGame {
     public void setCheeseLocation(CellLocation cheeseLocation) {
         this.cheeseLocation = cheeseLocation;
     }
-
-
 
     public int getNumCheeseCollected() {
         return numCheeseCollected;
@@ -124,6 +120,7 @@ public class MazeGame {
         return playerLocation.equals(cell);
     }
     public void moveCat() {
+        System.out.println("cat moved\n");
         for (Cat cat : cats) {
             cat.doMove();
         }
@@ -180,6 +177,18 @@ public class MazeGame {
             for (int x = 0; x < MazeGame.getBoardWidth(); x++) {
                 CellLocation cell = new CellLocation(x, y);
                 maze.recordCellVisible(cell);
+            }
+        }
+    }
+
+    @Override
+    public void run() {
+        while (!hasUserWon() && !hasUserLost()) {
+            try {
+                moveCat();
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
