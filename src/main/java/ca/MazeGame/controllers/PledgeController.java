@@ -1,13 +1,11 @@
 package ca.MazeGame.controllers;
 
 import ca.MazeGame.exception.ResourceNotFoundException;
-import ca.MazeGame.model.ApiBoardWrapper;
-import ca.MazeGame.model.ApiGameWrapper;
-import ca.MazeGame.model.MazeGame;
-import ca.MazeGame.model.Pledge;
+import ca.MazeGame.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -35,12 +33,15 @@ public class PledgeController {
     */
     @PostMapping("/games")
     @ResponseStatus(HttpStatus.CREATED)
-    public ApiGameWrapper postNewgame() {
+    public ApiGameWrapper postNewgame() throws SocketException {
         MazeGame mazeGame = new MazeGame();
         ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, nextId.incrementAndGet());
         apiGameWrappers.add(apiGameWrapper);
         Thread myThread = new Thread(mazeGame);
         myThread.start();
+        DUPListener dupListener = new DUPListener();
+        Thread dupThread = new Thread(dupListener);
+        dupThread.start();
         return apiGameWrapper.processMaze();
     }
 
