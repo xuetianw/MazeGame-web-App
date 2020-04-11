@@ -7,6 +7,7 @@ import java.net.SocketException;
 
 public class DUPListener implements Runnable
 {
+    public static final int PORT = 1234;
     // A utility method to convert the byte array
     // data into a string representation.
     public static StringBuilder data(byte[] a)
@@ -28,19 +29,19 @@ public class DUPListener implements Runnable
         // Step 1 : Create a socket to listen at port 1234
         DatagramSocket ds = null;
         try {
-            ds = new DatagramSocket(1234);
+            ds = new DatagramSocket(PORT);
         } catch (SocketException e) {
             e.printStackTrace();
         }
         byte[] receive = new byte[65535];
 
         DatagramPacket DpReceive = null;
+        System.out.printf("netcat -u 127.0.0.1 %d\n", PORT);
         while (true)
         {
 
             // Step 2 : create a DatgramPacket to receive the data.
             DpReceive = new DatagramPacket(receive, receive.length);
-
             // Step 3 : revieve the data in byte buffer.
             try {
                 ds.receive(DpReceive);
