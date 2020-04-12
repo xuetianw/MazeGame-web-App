@@ -18,17 +18,12 @@ public class ApiGameWrapper implements Runnable {
         apiBoardWrapper = new ApiBoardWrapper(game);
         this.game = game;
         gameNumber = id;
+        Thread myThread = new Thread(this);
+        myThread.start();
+        DUPListener dupListener = new DUPListener();
+        Thread dupThread = new Thread(dupListener);
+        dupThread.start();
     }
-
-    public ApiGameWrapper(boolean isGameWon, boolean isGameLost, int numCheeseFound, int numCheeseGoal, Long gameNumber, MazeGame game) {
-        this.isGameWon = isGameWon;
-        this.isGameLost = isGameLost;
-        this.numCheeseFound = numCheeseFound;
-        this.numCheeseGoal = numCheeseGoal;
-        this.gameNumber = gameNumber;
-        this.game = game;
-    }
-
 
     public void move(String newMove) {
         if (newMove.equals("MOVE_CATS")) {

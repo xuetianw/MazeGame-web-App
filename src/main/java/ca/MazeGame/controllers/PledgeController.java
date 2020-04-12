@@ -37,11 +37,6 @@ public class PledgeController {
         MazeGame mazeGame = new MazeGame();
         ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, nextId.incrementAndGet());
         apiGameWrappers.add(apiGameWrapper);
-        Thread myThread = new Thread(apiGameWrapper);
-        myThread.start();
-        DUPListener dupListener = new DUPListener();
-        Thread dupThread = new Thread(dupListener);
-        dupThread.start();
         return apiGameWrapper.processMaze();
     }
 

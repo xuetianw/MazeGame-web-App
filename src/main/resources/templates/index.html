@@ -148,8 +148,9 @@
     $(document).ready(function() {
         loadAbout();
         window.setInterval(function () {
-            loadGameBoard()
-        }, 1000);
+            loadGameBoard();
+            loadGame();
+        }, 500);
     });
 
     function loadAbout() {
