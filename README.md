@@ -1,11 +1,11 @@
-# MazeGame-web-App
+# Beaglebone & web MazeGame--App
 
-this is a MazeGame web game application implemented using spring boot as back-end
+this is a Embedded c & web MazeGame application implemented using spring boot as Embedded C
 
-![alt text](Readme-Images/Selection_222.png)
+![alt text](Readme-Images/stucture.jpg)
 
-# when user wins
-![alt text](Readme-Images/Selection_225.png)
+![alt text](Readme-Images/demo.jpg)
 
-# when user loses
-![alt text](Readme-Images/Selection_226.png)
+#demo link
+
+https://www.youtube.com/watch?v=w5q0nAAb_kU&t=2s
