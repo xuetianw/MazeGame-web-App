@@ -15,7 +15,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class PledgeController {
     private List<Pledge> pledges = new ArrayList<>();
     private AtomicLong nextId = new AtomicLong();
-
+    DUPListener dupListener = new DUPListener();
+    Thread UDPThread;
     private List<ApiGameWrapper> apiGameWrappers = new ArrayList<>();
 
 
@@ -37,6 +38,13 @@ public class PledgeController {
         MazeGame mazeGame = new MazeGame();
         ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, nextId.incrementAndGet());
         apiGameWrappers.add(apiGameWrapper);
+        dupListener.setGame(mazeGame);
+
+        if (apiGameWrapper.gameNumber == 1) {
+            UDPThread = new Thread(dupListener);
+            UDPThread.start();
+        }
+//        DUPListener.udp_init();
         return apiGameWrapper.processMaze();
     }
 

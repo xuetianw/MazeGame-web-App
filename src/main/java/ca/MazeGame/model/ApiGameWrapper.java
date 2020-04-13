@@ -14,15 +14,17 @@ public class ApiGameWrapper implements Runnable {
     public MazeGame game;
     public ApiBoardWrapper apiBoardWrapper;
 
+    public static final String COMMAND_LEFT = "MOVE_LEFT";
+    public static final String COMMAND_RIGHT = "MOVE_RIGHT";
+    public static final String COMMAND_UP = "MOVE_UP";
+    public static final String COMMAND_DOWN = "MOVE_DOWN";
+
     public ApiGameWrapper(MazeGame game, long id) {
         apiBoardWrapper = new ApiBoardWrapper(game);
         this.game = game;
         gameNumber = id;
         Thread myThread = new Thread(this);
         myThread.start();
-        DUPListener dupListener = new DUPListener();
-        Thread dupThread = new Thread(dupListener);
-        dupThread.start();
     }
 
     public void move(String newMove) {
@@ -48,8 +50,7 @@ public class ApiGameWrapper implements Runnable {
     }
 
     public void doPlayerMove(String arrow) {
-        Direction move = Direction.NOT_MOVING;
-        move = getPlayerMove(arrow);
+        Direction move = getPlayerMove(arrow);
         if (!game.isValidPlayerMove(move)) {
             throw new InvalidMoveException("new location on the wall");
         } else {
@@ -61,7 +62,8 @@ public class ApiGameWrapper implements Runnable {
         }
     }
 
-    Direction getPlayerMove(String newMove) {
+    public static Direction getPlayerMove(String newMove) {
+        System.out.println(newMove);
         switch (newMove) {
             case "MOVE_LEFT":
                 return Direction.MOVE_LEFT;
