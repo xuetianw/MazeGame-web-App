@@ -12,11 +12,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @RequestMapping("/api")
-public class PledgeController {
-    private List<Pledge> pledges = new ArrayList<>();
+public class GameController {
     private AtomicLong nextId = new AtomicLong();
-    DUPListener dupListener = new DUPListener();
-    Thread UDPThread;
     private List<ApiGameWrapper> apiGameWrappers = new ArrayList<>();
 
 
@@ -38,13 +35,6 @@ public class PledgeController {
         MazeGame mazeGame = new MazeGame();
         ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, nextId.incrementAndGet());
         apiGameWrappers.add(apiGameWrapper);
-        dupListener.setGame(mazeGame);
-
-        if (apiGameWrapper.gameNumber == 1) {
-            UDPThread = new Thread(dupListener);
-            UDPThread.start();
-        }
-//        DUPListener.udp_init();
         return apiGameWrapper.processMaze();
     }
 
@@ -101,50 +91,6 @@ Return 404 (File Not Found) if the requested game does not exist.
             }
         }
         throw new ResourceNotFoundException(String.format("game number %d does not exist", gameId));
-    }
-
-
-    @PostMapping("/pledges")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Pledge createNewPledge(@RequestBody Pledge pledge) {
-        // Set pledge to have next ID:
-        pledge.setId(nextId.incrementAndGet());
-
-        pledges.add(pledge);
-        return pledge;
-    }
-
-    @GetMapping("/pledges")
-    public List<Pledge> getAllPledges() {
-        return pledges;
-    }
-
-    @GetMapping("/pledges/{id}")
-    public Pledge getOnePledge(@PathVariable("id") long pledgeId) {
-        for (Pledge pledge : pledges) {
-            if (pledge.getId() == pledgeId) {
-                return pledge;
-            }
-        }
-
-        throw new IllegalArgumentException();
-    }
-
-    @PostMapping("pledges/{id}")
-    public Pledge editOnePledge(
-            @PathVariable("id") long pledgeId,
-            @RequestBody Pledge newPledge
-    ) {
-        for (Pledge pledge : pledges) {
-            if (pledge.getId() == pledgeId) {
-                pledges.remove(pledge);
-                newPledge.setId(pledgeId);
-                pledges.add(newPledge);
-                return pledge;
-            }
-        }
-
-        throw new IllegalArgumentException();
     }
 
 
