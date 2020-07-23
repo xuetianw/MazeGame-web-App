@@ -391,15 +391,14 @@
     function sendIncreaseCatSpeed() {
         axios.put('/api/games/' + myAppObj.game.gameNumber + "/increaseSpeed")
             .then(function (response) {
-                console.log("Cat move returned: ", response);
-                myAppObj.playersTurn = true;
+                // console.log("Cat move returned: ", response);
                 loadGameBoard();
                 loadGame();
             })
             .catch(function (error) {
                 console.log("speed increase ERROR: ", error);
             });
-        console.log("sendIncreaseCatSpeed")
+        // console.log("sendIncreaseCatSpeed\n")
     }
 
 

@@ -94,6 +94,7 @@ Return 404 (File Not Found) if the requested game does not exist.
     }
 
     @PutMapping("games/{id}/increaseSpeed")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public void increaseCatSpeed(@PathVariable("id") int id) {
         for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
             if(apiGameWrapper.gameNumber== id){
