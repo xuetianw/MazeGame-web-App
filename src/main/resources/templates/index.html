@@ -20,7 +20,7 @@
                 New Game
             </button>
 
-            <span v-if="game != null">
+            <span>
                 <button type="button" v-on:click="cheat1Cheese()">
                     Cheat: 1 Cheese
                 </button>
@@ -30,7 +30,30 @@
                 <button type="button" v-on:click="catMove()">
                     Force Cat Move
                 </button>
+                <button type="button" v-on:click="increaseMouseSpeed()">
+                    Increase mouse speed
+                </button>
             </span>
+
+
+            <!-- Buttons for testing -->
+            <h2>Testing API Error Handling</h2>
+            <p>
+                <button type="button" v-on:click="getBadGame()">
+                    Test: Bad Game
+                </button>
+                <button type="button" v-on:click="getBadBoard()">
+                    Test: Bad Board
+                </button>
+                <button type="button" v-on:click="doBadCheat()">
+                    Test: Bad Cheat
+                </button>
+                <button type="button" v-on:click="doBadMove()">
+                    Test: Bad Move
+                </button>
+            </p>
+
+
         </p>
 
         <!-- Game state -->
@@ -74,22 +97,7 @@
             <h1 v-if="game.isGameWon">YOU WON! Congratulations!</h1>
             <h1 v-if="game.isGameLost">YOU LOST! Try again?</h1>
 
-            <!-- Buttons for testing -->
-            <h2>Testing API Error Handling</h2>
-            <p>
-                <button type="button" v-on:click="getBadGame()">
-                    Test: Bad Game
-                </button>
-                <button type="button" v-on:click="getBadBoard()">
-                    Test: Bad Board
-                </button>
-                <button type="button" v-on:click="doBadCheat()">
-                    Test: Bad Cheat
-                </button>
-                <button type="button" v-on:click="doBadMove()">
-                    Test: Bad Move
-                </button>
-            </p>
+
         </div>
     </div>
 
@@ -114,6 +122,7 @@
             cheat1Cheese: send1CheeseCheat,
             cheatShowAll: sendShowAll,
             catMove: sendMoveCats,
+            increaseMouseSpeed :  sendIncreaseCatSpeed,
 
             // Testing error handling
             getBadGame: testGetBadGame,
@@ -150,7 +159,7 @@
         window.setInterval(function () {
             loadGameBoard();
             loadGame();
-        }, 500);
+        }, 50);
     });
 
     function loadAbout() {
@@ -184,7 +193,7 @@
     function loadGame() {
         axios.get('/api/games/' + myAppObj.game.gameNumber, {})
             .then(function (response) {
-                console.log("Load game returned:", response);
+                // console.log("Load game returned:", response);
                 myAppObj.game = response.data;
 
                 alertOnWrongStatus("GET Game", 200, response.status);
@@ -196,7 +205,7 @@
     function loadGameBoard() {
         axios.get('/api/games/' + myAppObj.game.gameNumber + "/board", {})
             .then(function (response) {
-                console.log("Load Board returned: ", response);
+                // console.log("Load Board returned: ", response);
                 myAppObj.board = response.data;
 
                 alertOnWrongStatus("GET board", 200, response.status);
@@ -377,6 +386,20 @@
                 + "]; expected " + expectedStatus
                 + " but server returned " + actualStatus)
         }
+    }
+
+    function sendIncreaseCatSpeed() {
+        axios.put('/api/games/' + myAppObj.game.gameNumber + "/increaseSpeed")
+            .then(function (response) {
+                console.log("Cat move returned: ", response);
+                myAppObj.playersTurn = true;
+                loadGameBoard();
+                loadGame();
+            })
+            .catch(function (error) {
+                console.log("speed increase ERROR: ", error);
+            });
+        console.log("sendIncreaseCatSpeed")
     }
 
 

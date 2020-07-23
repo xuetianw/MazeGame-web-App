@@ -93,6 +93,16 @@ Return 404 (File Not Found) if the requested game does not exist.
         throw new ResourceNotFoundException(String.format("game number %d does not exist", gameId));
     }
 
+    @PutMapping("games/{id}/increaseSpeed")
+    public void increaseCatSpeed(@PathVariable("id") int id) {
+        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
+            if(apiGameWrapper.gameNumber== id){
+                apiGameWrapper.decreaseTimeInterval();
+                return;
+            }
+        }
+    }
+
 
     // Create Exception Handle
     @ResponseStatus(value = HttpStatus.BAD_REQUEST,
