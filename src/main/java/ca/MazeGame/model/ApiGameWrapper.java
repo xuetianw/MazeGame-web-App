@@ -120,4 +120,12 @@ public class ApiGameWrapper implements Runnable {
         }
 
     }
+
+    public void increaseTimeInterval() {
+        if (timeInterval <= 1000) {
+            timeInterval += 50;
+        } else {
+            throw new BadRequestException("the limit has been reached");
+        }
+    }
 }

@@ -30,8 +30,11 @@
                 <button type="button" v-on:click="catMove()">
                     Force Cat Move
                 </button>
-                <button type="button" v-on:click="increaseMouseSpeed()">
+                <button type="button" v-on:click="increaseCatSpeed()">
                     Increase mouse speed
+                </button>
+                <button type="button" v-on:click="decreaseCatSpeed()">
+                    Decrease mouse speed
                 </button>
             </span>
 
@@ -122,7 +125,8 @@
             cheat1Cheese: send1CheeseCheat,
             cheatShowAll: sendShowAll,
             catMove: sendMoveCats,
-            increaseMouseSpeed :  sendIncreaseCatSpeed,
+            increaseCatSpeed:  sendIncreaseCatSpeed,
+            decreaseCatSpeed:  sendDecreaseCatSpeed,
 
             // Testing error handling
             getBadGame: testGetBadGame,
@@ -399,6 +403,18 @@
                 console.log("speed increase ERROR: ", error);
             });
         // console.log("sendIncreaseCatSpeed\n")
+    }
+
+    function sendDecreaseCatSpeed() {
+        axios.put('/api/games/' + myAppObj.game.gameNumber + "/decreaseSpeed")
+            .then(function (response) {
+                // console.log("Cat move returned: ", response);
+                loadGameBoard();
+                loadGame();
+            })
+            .catch(function (error) {
+                console.log("speed increase ERROR: ", error);
+            });
     }
 
 

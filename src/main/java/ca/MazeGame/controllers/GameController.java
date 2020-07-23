@@ -104,6 +104,18 @@ Return 404 (File Not Found) if the requested game does not exist.
         }
     }
 
+    @PutMapping("games/{id}/decreaseSpeed")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void decreaseCatSpeed(@PathVariable("id") int id) {
+        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
+            if(apiGameWrapper.gameNumber== id){
+                apiGameWrapper.increaseTimeInterval();
+                return;
+            }
+        }
+    }
+
+
 
     // Create Exception Handle
     @ResponseStatus(value = HttpStatus.BAD_REQUEST,
