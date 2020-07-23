@@ -15,6 +15,8 @@ const myAppObj = new Vue({
         cheat1Cheese: send1CheeseCheat,
         cheatShowAll: sendShowAll,
         catMove: sendMoveCats,
+        increaseCatSpeed:  sendIncreaseCatSpeed,
+        decreaseCatSpeed:  sendDecreaseCatSpeed,
 
         // Testing error handling
         getBadGame: testGetBadGame,
@@ -49,8 +51,9 @@ window.addEventListener('keydown', function(e) {
 $(document).ready(function() {
     loadAbout();
     window.setInterval(function () {
-        loadGameBoard()
-    }, 1000);
+        loadGameBoard();
+        loadGame();
+    }, 50);
 });
 
 function loadAbout() {
@@ -83,27 +86,27 @@ function makeNewGame() {
 
 function loadGame() {
     axios.get('/api/games/' + myAppObj.game.gameNumber, {})
-      .then(function (response) {
-        console.log("Load game returned:", response);
-        myAppObj.game = response.data;
+        .then(function (response) {
+            // console.log("Load game returned:", response);
+            myAppObj.game = response.data;
 
-        alertOnWrongStatus("GET Game", 200, response.status);
-      })
-      .catch(function (error) {
-        console.log("Load game ERROR: ", error);
-      });
+            alertOnWrongStatus("GET Game", 200, response.status);
+        })
+        .catch(function (error) {
+            console.log("Load game ERROR: ", error);
+        });
 }
 function loadGameBoard() {
     axios.get('/api/games/' + myAppObj.game.gameNumber + "/board", {})
-      .then(function (response) {
-        console.log("Load Board returned: ", response);
-        myAppObj.board = response.data;
+        .then(function (response) {
+            // console.log("Load Board returned: ", response);
+            myAppObj.board = response.data;
 
-        alertOnWrongStatus("GET board", 200, response.status);
-      })
-      .catch(function (error) {
-        console.log("Load Board ERROR: ", error);
-      });
+            alertOnWrongStatus("GET board", 200, response.status);
+        })
+        .catch(function (error) {
+            console.log("Load Board ERROR: ", error);
+        });
 }
 function send1CheeseCheat() {
     axios.post('/api/games/' + myAppObj.game.gameNumber + "/cheatstate", "1_CHEESE", plainTextConfig)
@@ -180,7 +183,7 @@ function sendMove(directionStr) {
 }
 
 // Source: https://www.w3schools.com/graphics/game_sound.asp
-var mySound = new sound("res/BONK.WAV");
+var mySound = new sound("BONK.WAV");
 function sound(src) {
     this.sound = document.createElement("audio");
     this.sound.src = src;
@@ -279,4 +282,28 @@ function alertOnWrongStatus(description, expectedStatus, actualStatus) {
     }
 }
 
+function sendIncreaseCatSpeed() {
+    axios.put('/api/games/' + myAppObj.game.gameNumber + "/increaseSpeed")
+        .then(function (response) {
+            // console.log("Cat move returned: ", response);
+            loadGameBoard();
+            loadGame();
+        })
+        .catch(function (error) {
+            console.log("speed increase ERROR: ", error);
+        });
+    // console.log("sendIncreaseCatSpeed\n")
+}
+
+function sendDecreaseCatSpeed() {
+    axios.put('/api/games/' + myAppObj.game.gameNumber + "/decreaseSpeed")
+        .then(function (response) {
+            // console.log("Cat move returned: ", response);
+            loadGameBoard();
+            loadGame();
+        })
+        .catch(function (error) {
+            console.log("speed increase ERROR: ", error);
+        });
+}
 
