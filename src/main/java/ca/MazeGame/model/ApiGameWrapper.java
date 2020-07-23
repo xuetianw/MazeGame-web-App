@@ -13,6 +13,7 @@ public class ApiGameWrapper implements Runnable {
     public Long gameNumber;
     public MazeGame game;
     public ApiBoardWrapper apiBoardWrapper;
+    private int timeInterval = 1000;
 
     public static final String COMMAND_LEFT = "MOVE_LEFT";
     public static final String COMMAND_RIGHT = "MOVE_RIGHT";
@@ -25,6 +26,15 @@ public class ApiGameWrapper implements Runnable {
         gameNumber = id;
         Thread myThread = new Thread(this);
         myThread.start();
+    }
+
+
+    public int getTimeInterval() {
+        return timeInterval;
+    }
+
+    public void setTimeInterval(int timeInterval) {
+        this.timeInterval = timeInterval;
     }
 
     public void move(String newMove) {
@@ -42,7 +52,7 @@ public class ApiGameWrapper implements Runnable {
             try {
                 game.moveCat();
                 doWonOrLost();
-                Thread.sleep(1000);
+                Thread.sleep(timeInterval);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -100,5 +110,22 @@ public class ApiGameWrapper implements Runnable {
         numCheeseFound = game.getNumCheeseCollected();
         numCheeseGoal = MazeGame.getNumCheeseToCollect();
         return this;
+    }
+
+    public void decreaseTimeInterval() {
+        if (timeInterval >= 200) {
+            timeInterval -= 50;
+        } else {
+            throw new BadRequestException("the limit has been reached");
+        }
+
+    }
+
+    public void increaseTimeInterval() {
+        if (timeInterval <= 1000) {
+            timeInterval += 50;
+        } else {
+            throw new BadRequestException("the limit has been reached");
+        }
     }
 }
