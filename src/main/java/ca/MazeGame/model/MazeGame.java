@@ -53,11 +53,11 @@ public class MazeGame {
     }
 
 
-    public static List<Cat> getCats() {
+    public List<Cat> getCats() {
         return cats;
     }
 
-    public static final List<Cat> cats = new ArrayList<>();
+    public final List<Cat> cats = new ArrayList<>();
 
     public Maze getMaze() {
         return maze;

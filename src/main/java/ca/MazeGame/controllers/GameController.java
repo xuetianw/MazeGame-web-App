@@ -35,6 +35,8 @@ public class GameController {
         MazeGame mazeGame = new MazeGame();
         ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, nextId.incrementAndGet());
         apiGameWrappers.add(apiGameWrapper);
+        Thread myThread = new Thread(apiGameWrapper);
+        myThread.start();
         return apiGameWrapper.processMaze();
     }
 

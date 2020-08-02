@@ -24,8 +24,6 @@ public class ApiGameWrapper implements Runnable {
         apiBoardWrapper = new ApiBoardWrapper(game);
         this.game = game;
         gameNumber = id;
-        Thread myThread = new Thread(this);
-        myThread.start();
     }
 
 
@@ -49,6 +47,7 @@ public class ApiGameWrapper implements Runnable {
     @Override
     public void run() {
         while (!game.hasUserWon() && !game.hasUserLost()) {
+//            System.out.println(game.toString());
             try {
                 game.moveCat();
                 doWonOrLost();
@@ -92,6 +91,7 @@ public class ApiGameWrapper implements Runnable {
     }
 
     public void doWonOrLost() {
+//        System.out.println("called");
         if (game.hasUserWon()) {
             revealBoard();
         } else if (game.hasUserLost()) {

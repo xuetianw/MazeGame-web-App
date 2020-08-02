@@ -47,7 +47,7 @@ public class ApiBoardWrapper {
 
     private void place_cat() {
         List<CellLocation> locations = new ArrayList<>();
-        for (Cat cat : MazeGame.getCats()) {
+        for (Cat cat : game.getCats()) {
             locations.add(cat.getLocation());
         }
         catLocations = ApiLocationWrapper.makeFromCellLocations(locations);
