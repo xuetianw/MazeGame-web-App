@@ -33,6 +33,13 @@ public class GameController {
     @ResponseStatus(HttpStatus.CREATED)
     public ApiGameWrapper postNewgame() throws SocketException {
         MazeGame mazeGame = new MazeGame();
+        if (apiGameWrappers.size() != 0) {
+            ApiGameWrapper apiGameWrapper =  apiGameWrappers.get(apiGameWrappers.size() - 1);
+            MazeGame game = apiGameWrapper.getGame();
+            if (!game.hasUserWon() && !game.hasUserLost()) {
+                apiGameWrapper.setThreadStop(true);
+            }
+        }
         ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, nextId.incrementAndGet());
         apiGameWrappers.add(apiGameWrapper);
         Thread myThread = new Thread(apiGameWrapper);

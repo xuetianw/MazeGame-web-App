@@ -11,6 +11,9 @@ public class ApiGameWrapper implements Runnable {
     public int numCheeseFound;
     public int numCheeseGoal;
     public Long gameNumber;
+    private boolean threadStop = false;
+
+
     public MazeGame game;
     public ApiBoardWrapper apiBoardWrapper;
     private int timeInterval = 1000;
@@ -35,6 +38,22 @@ public class ApiGameWrapper implements Runnable {
         this.timeInterval = timeInterval;
     }
 
+    public MazeGame getGame() {
+        return game;
+    }
+
+    public void setGame(MazeGame game) {
+        this.game = game;
+    }
+
+    public boolean isThreadStop() {
+        return threadStop;
+    }
+
+    public void setThreadStop(boolean threadStop) {
+        this.threadStop = threadStop;
+    }
+
     public void move(String newMove) {
         if (newMove.equals("MOVE_CATS")) {
             game.moveCat();
@@ -46,8 +65,8 @@ public class ApiGameWrapper implements Runnable {
 
     @Override
     public void run() {
-        while (!game.hasUserWon() && !game.hasUserLost()) {
-//            System.out.println(game.toString());
+        while (!game.hasUserWon() && !game.hasUserLost() && !threadStop) {
+            System.out.println(game.toString());
             try {
                 game.moveCat();
                 doWonOrLost();
