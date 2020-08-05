@@ -66,7 +66,7 @@ public class ApiGameWrapper implements Runnable {
     @Override
     public void run() {
         while (!game.hasUserWon() && !game.hasUserLost() && !threadStop) {
-            System.out.println(game.toString());
+//            System.out.println(game.toString());
             try {
                 game.moveCat();
                 doWonOrLost();

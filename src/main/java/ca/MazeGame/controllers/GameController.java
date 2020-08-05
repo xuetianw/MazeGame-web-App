@@ -77,7 +77,6 @@ Return 404 (File Not Found) if the requested game does not exist.
         throw new ResourceNotFoundException(String.format("gane number %d does not exist", gameId));
     }
 
-
 //3. Board
     @GetMapping("/games/{id}/board")
     public ApiBoardWrapper getBoard(@PathVariable("id") int id) {
@@ -123,6 +122,21 @@ Return 404 (File Not Found) if the requested game does not exist.
             }
         }
     }
+
+    @PostMapping("games/{id}/cheatstate")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void showBoard(@PathVariable("id") int id,
+            @RequestBody String newMove) {
+        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
+            if(apiGameWrapper.gameNumber== id){
+                if (newMove.equals("SHOW_ALL")) {
+                    apiGameWrapper.revealBoard();
+                }
+                return;
+            }
+        }
+    }
+
 
 
 

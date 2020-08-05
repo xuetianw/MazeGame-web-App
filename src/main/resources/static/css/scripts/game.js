@@ -18,12 +18,6 @@ const myAppObj = new Vue({
         increaseCatSpeed:  sendIncreaseCatSpeed,
         decreaseCatSpeed:  sendDecreaseCatSpeed,
 
-        // Testing error handling
-        getBadGame: testGetBadGame,
-        getBadBoard: testGetBadBoard,
-        doBadCheat: testDoBadCheat,
-        doBadMove: testDoBadMove,
-
         locationMatches: function(loc, x, y) {
             return loc.x == x && loc.y == y;
         },
@@ -76,7 +70,6 @@ function makeNewGame() {
             myAppObj.game = response.data;
             // myAppObj.playersTurn = true;
             loadGameBoard();
-
             alertOnWrongStatus("POST games", 201, response.status);
         })
         .catch(function (error) {
@@ -150,11 +143,6 @@ function sendMoveCats() {
 }
 
 function sendMove(directionStr) {
-    // if (!myAppObj.playersTurn) {
-    //     console.log("Not player's turn yet! Cats must move.");
-    //     return;
-    // }
-
     if (myAppObj.game.isGameLost || myAppObj.game.isGameWon) {
         console.log("Unable to make move after game has ended.");
         return;
@@ -201,76 +189,6 @@ function sound(src) {
 function playSound() {
     mySound.play();
 }
-
-
-
-// Testing Functions
-function testGetBadGame() {
-    testErrorHandling(
-        "Test Get Bad Game",
-        "GET",
-        '/api/games/' + 2352523,
-        "",
-        404);
-}
-function testGetBadBoard() {
-    testErrorHandling(
-        "Test Get Bad Board",
-        "GET",
-        '/api/games/' + 2352523 + "/board",
-        "",
-        404);
-}
-function testDoBadCheat() {
-    testErrorHandling(
-        "Test Cheat on bad game",
-        "POST",
-        '/api/games/' + 2352523 + "/cheatstate",
-        "1_CHEESE",
-        404);
-
-    testErrorHandling(
-        "Test Bad Move",
-        "POST",
-        '/api/games/' + myAppObj.game.gameNumber + "/moves",
-        "NoSuchCheat",
-        400);
-}
-function testDoBadMove() {
-    testErrorHandling(
-        "Test Move on bad game",
-        "POST",
-        '/api/games/' + 2352523 + "/moves",
-        "MOVE_UP",
-        404);
-
-    testErrorHandling(
-        "Test Bad Move",
-        "POST",
-        '/api/games/' + myAppObj.game.gameNumber + "/moves",
-        "NoSuchMove",
-        400);
-}
-function testErrorHandling(name, method, url, data, result) {
-    axios( {
-        method: method,
-        url: url,
-        data: data,
-        config: plainTextConfig
-    })
-        .then(function (response) {
-            alert(name + ": Did *not* fail when it should have! (expected " + result + ")");
-        })
-        .catch(function (error) {
-            if (error.response.status != result) {
-                console.log(name + ": Returned incorrect error response code (expected " + result + "): ", error.response)
-                alert(name + ": Returned incorrect error response code (expected " + result + ")")
-            } else {
-                console.log(name + ": returned the correct response code: ", error)
-            }
-        });
-}
-
 
 
 function alertOnWrongStatus(description, expectedStatus, actualStatus) {
