@@ -10,5 +10,5 @@ this is a Embedded c & web MazeGame application implemented using spring boot as
 
 https://www.youtube.com/watch?v=w5q0nAAb_kU&t=2s
 
-# production on AWS cloud(MazeGame Only)
-http://mazegame-env.eba-tpq2hmas.ca-central-1.elasticbeanstalk.com/
+# production on AWS cloud
+http://mazegame-env-3.eba-tpq2hmas.ca-central-1.elasticbeanstalk.com/
