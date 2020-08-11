@@ -18,7 +18,7 @@ const myAppObj = new Vue({
         decreaseCatSpeed:  sendDecreaseCatSpeed,
 
         locationMatches: function(loc, x, y) {
-            return loc.x == x && loc.y == y;
+            return loc.x === x && loc.y === y;
         },
     }
 });
@@ -46,7 +46,7 @@ $(document).ready(function() {
     window.setInterval(function () {
         loadGameBoard();
         loadGame();
-    }, 150);
+    }, 200);
 });
 
 function loadAbout() {
