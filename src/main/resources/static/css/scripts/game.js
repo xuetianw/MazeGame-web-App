@@ -14,7 +14,6 @@ const myAppObj = new Vue({
         newGame: makeNewGame,
         cheat1Cheese: send1CheeseCheat,
         cheatShowAll: sendShowAll,
-        catMove: sendMoveCats,
         increaseCatSpeed:  sendIncreaseCatSpeed,
         decreaseCatSpeed:  sendDecreaseCatSpeed,
 
@@ -47,7 +46,7 @@ $(document).ready(function() {
     window.setInterval(function () {
         loadGameBoard();
         loadGame();
-    }, 50);
+    }, 100);
 });
 
 function loadAbout() {
@@ -69,7 +68,7 @@ function makeNewGame() {
             console.log("POST new game returned:", response);
             myAppObj.game = response.data;
             // myAppObj.playersTurn = true;
-            loadGameBoard();
+            // loadGameBoard();
             alertOnWrongStatus("POST games", 201, response.status);
         })
         .catch(function (error) {
@@ -94,6 +93,7 @@ function loadGameBoard() {
         .then(function (response) {
             // console.log("Load Board returned: ", response);
             myAppObj.board = response.data;
+            console.log(myAppObj.game.gameNumber)
 
             alertOnWrongStatus("GET board", 200, response.status);
         })
@@ -123,24 +123,6 @@ function sendShowAll() {
             console.log("Cheat ERROR: ", error);
         });
 }
-function sendMoveCats() {
-    if (myAppObj.game.isGameLost || myAppObj.game.isGameWon) {
-        console.log("Cats cannot make move after game has ended.");
-        return;
-    }
-
-    axios.post('/api/games/' + myAppObj.game.gameNumber + "/moves", "MOVE_CATS", plainTextConfig)
-        .then(function (response) {
-            console.log("Cat move returned: ", response);
-            myAppObj.playersTurn = true;
-            loadGameBoard();
-            loadGame();
-            alertOnWrongStatus("POST Cats Move", 202, response.status);
-        })
-        .catch(function (error) {
-            console.log("Cat move ERROR: ", error);
-        });
-}
 
 function sendMove(directionStr) {
     if (myAppObj.game.isGameLost || myAppObj.game.isGameWon) {
@@ -151,8 +133,8 @@ function sendMove(directionStr) {
     axios.post('/api/games/' + myAppObj.game.gameNumber + "/moves", directionStr, plainTextConfig)
         .then(function (response) {
             console.log("Move player returned:", response);
-            loadGameBoard();
-            loadGame();
+            // loadGameBoard();
+            // loadGame();
 
             // Cats go next, after a moment
             // myAppObj.playersTurn = false;

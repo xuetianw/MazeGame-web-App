@@ -1,6 +1,6 @@
 package ca.MazeGame.model;// Java program to illustrate Server side
 // Implementation using DatagramSocket
-import ca.MazeGame.exception.InvalidMoveException;
+import ca.MazeGame.Wrappers.ApiGameWrapper;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

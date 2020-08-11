@@ -1,5 +1,7 @@
 package ca.MazeGame.controllers;
 
+import ca.MazeGame.Wrappers.ApiBoardWrapper;
+import ca.MazeGame.Wrappers.ApiGameWrapper;
 import ca.MazeGame.exception.ResourceNotFoundException;
 import ca.MazeGame.model.*;
 import org.springframework.http.HttpStatus;

@@ -1,7 +1,9 @@
-package ca.MazeGame.model;
+package ca.MazeGame.Wrappers;
 
 import ca.MazeGame.exception.BadRequestException;
 import ca.MazeGame.exception.InvalidMoveException;
+import ca.MazeGame.model.Direction;
+import ca.MazeGame.model.MazeGame;
 
 
 public class ApiGameWrapper implements Runnable {

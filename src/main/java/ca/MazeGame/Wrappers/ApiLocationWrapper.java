@@ -1,4 +1,6 @@
-package ca.MazeGame.model;
+package ca.MazeGame.Wrappers;
+
+import ca.MazeGame.model.CellLocation;
 
 import java.util.ArrayList;
 import java.util.Iterator;

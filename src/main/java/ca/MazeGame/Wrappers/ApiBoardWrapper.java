@@ -1,4 +1,8 @@
-package ca.MazeGame.model;
+package ca.MazeGame.Wrappers;
+
+import ca.MazeGame.model.Cat;
+import ca.MazeGame.model.CellLocation;
+import ca.MazeGame.model.MazeGame;
 
 import java.util.ArrayList;
 import java.util.List;
