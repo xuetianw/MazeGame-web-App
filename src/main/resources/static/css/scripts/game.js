@@ -46,7 +46,7 @@ $(document).ready(function() {
     window.setInterval(function () {
         loadGameBoard();
         loadGame();
-    }, 100);
+    }, 150);
 });
 
 function loadAbout() {

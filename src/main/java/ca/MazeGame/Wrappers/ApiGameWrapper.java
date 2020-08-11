@@ -93,7 +93,7 @@ public class ApiGameWrapper implements Runnable {
     }
 
     public static Direction getPlayerMove(String newMove) {
-        System.out.println(newMove);
+//        System.out.println(newMove);
         switch (newMove) {
             case "MOVE_LEFT":
                 return Direction.MOVE_LEFT;

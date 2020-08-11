@@ -97,7 +97,6 @@ public class DUPListener implements Runnable
             System.out.println("user move left");
         } else if (commnad.equals(COMMAND_RIGHT)) {
             instruction = ApiGameWrapper.COMMAND_RIGHT;
-            System.out.println("user move right");
         } else if (commnad.equals(COMMAND_UP)) {
             instruction = ApiGameWrapper.COMMAND_UP;
             System.out.println("user move up");
