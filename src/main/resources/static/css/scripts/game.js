@@ -93,7 +93,7 @@ function loadGameBoard() {
         .then(function (response) {
             // console.log("Load Board returned: ", response);
             myAppObj.board = response.data;
-            console.log(myAppObj.game.gameNumber)
+            // console.log(myAppObj.game.gameNumber)
 
             alertOnWrongStatus("GET board", 200, response.status);
         })
