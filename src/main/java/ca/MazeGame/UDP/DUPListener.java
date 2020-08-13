@@ -1,6 +1,8 @@
-package ca.MazeGame.model;// Java program to illustrate Server side
+package ca.MazeGame.UDP;// Java program to illustrate Server side
 // Implementation using DatagramSocket
 import ca.MazeGame.Wrappers.ApiGameWrapper;
+import ca.MazeGame.model.Direction;
+import ca.MazeGame.model.MazeGame;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
