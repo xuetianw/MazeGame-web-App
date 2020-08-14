@@ -67,12 +67,12 @@ public class ApiBoardWrapper {
         }
     }
 
-    public ApiBoardWrapper processMaze() {
-        placeMouse();
-        placeCheese();
-        setVisibilityArray();
-        place_cat();
-        place_wall();
-        return this;
-    }
+//    public ApiBoardWrapper processMaze() {
+//        placeMouse();
+//        placeCheese();
+//        setVisibilityArray();
+//        place_cat();
+//        place_wall();
+//        return this;
+//    }
 }

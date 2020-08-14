@@ -16,6 +16,7 @@ const myAppObj = new Vue({
         cheatShowAll: sendShowAll,
         increaseCatSpeed:  sendIncreaseCatSpeed,
         decreaseCatSpeed:  sendDecreaseCatSpeed,
+        secondPlayer : connectSecondPlayer,
 
         locationMatches: function(loc, x, y) {
             return loc.x === x && loc.y === y;
@@ -203,7 +204,19 @@ function sendDecreaseCatSpeed() {
             loadGame();
         })
         .catch(function (error) {
+            console.log("speed decrease ERROR: ", error);
+        });
+}
+
+function connectSecondPlayer() {
+    axios.put('device-connect')
+        .then(function (response) {
+            // console.log("Cat move returned: ", response);
+            console.log(response);
+        })
+        .catch(function (error) {
             console.log("speed increase ERROR: ", error);
         });
+    console.log("here\n");
 }
 

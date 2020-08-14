@@ -1,7 +1,10 @@
 package ca.MazeGame.controllers;
 
+import ca.MazeGame.Threads.ThreadsMain;
 import ca.MazeGame.Wrappers.ApiBoardWrapper;
 import ca.MazeGame.Wrappers.ApiGameWrapper;
+import ca.MazeGame.exception.BadRequestException;
+import ca.MazeGame.exception.InvalidMoveException;
 import ca.MazeGame.exception.ResourceNotFoundException;
 import ca.MazeGame.model.*;
 import org.springframework.http.HttpStatus;
@@ -16,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @RequestMapping("/api")
 public class GameController {
     private AtomicLong nextId = new AtomicLong();
-    private List<ApiGameWrapper> apiGameWrappers = new ArrayList<>();
+    private List<MazeGame> games = new ArrayList<>();
 
 
     @GetMapping("about")
@@ -35,17 +38,11 @@ public class GameController {
     @ResponseStatus(HttpStatus.CREATED)
     public ApiGameWrapper postNewgame() throws SocketException {
         MazeGame mazeGame = new MazeGame();
-        if (apiGameWrappers.size() != 0) {
-            ApiGameWrapper apiGameWrapper =  apiGameWrappers.get(apiGameWrappers.size() - 1);
-            MazeGame game = apiGameWrapper.getGame();
-            if (!game.hasUserWon() && !game.hasUserLost()) {
-                apiGameWrapper.setThreadStop(true);
-            }
-        }
-        ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, nextId.incrementAndGet());
-        apiGameWrappers.add(apiGameWrapper);
-        Thread myThread = new Thread(apiGameWrapper);
-        myThread.start();
+        int gameID = games.size();
+        ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, gameID);
+        ThreadsMain.processGame(mazeGame);
+        games.add(mazeGame);
+
         return apiGameWrapper.processMaze();
     }
 
@@ -60,6 +57,11 @@ public class GameController {
      */
     @GetMapping("/games")
     public List<ApiGameWrapper> getGames() {
+        List<ApiGameWrapper> apiGameWrappers = new ArrayList<>();
+        for (int i = 0; i < games.size(); i++) {
+            MazeGame game = games.get(i);
+            apiGameWrappers.add(new ApiGameWrapper(game, i));
+        }
         return apiGameWrappers;
     }
 
@@ -71,71 +73,82 @@ Return 404 (File Not Found) if the requested game does not exist.
      */
     @GetMapping("games/{id}")
     public ApiGameWrapper getGames(@PathVariable("id") long gameId) {
-        for (ApiGameWrapper apiGameWrapper : apiGameWrappers) {
-            if (apiGameWrapper.gameNumber == gameId) {
-                return apiGameWrapper.processMaze();
-            }
+        if (gameId < 0 || gameId >= games.size()) {
+            throw new ResourceNotFoundException(String.format("gane number %d does not exist", gameId));
         }
-        throw new ResourceNotFoundException(String.format("gane number %d does not exist", gameId));
+        return new ApiGameWrapper(games.get((int)gameId), gameId).processMaze();
     }
 
 //3. Board
     @GetMapping("/games/{id}/board")
-    public ApiBoardWrapper getBoard(@PathVariable("id") int id) {
-        for (ApiGameWrapper apiGameWrapper : apiGameWrappers) {
-            if (apiGameWrapper.gameNumber == id) {
-                return apiGameWrapper.apiBoardWrapper.processMaze();
-            }
+    public ApiBoardWrapper getBoard(@PathVariable("id") long id) {
+        if (id < 0 || id >= games.size()) {
+            throw new ResourceNotFoundException(String.format("gane number %d does not exist", id));
         }
-        throw new ResourceNotFoundException(String.format("board number %d does not exist", id));
+        return (new ApiGameWrapper(games.get((int)id), id)).apiBoardWrapper;
     }
 
     @PostMapping("games/{id}/moves")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void makeMove(@PathVariable("id") int gameId,
+    public void makeMove(@PathVariable("id") long gameId,
                          @RequestBody String newMove) {
-        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
-            if(apiGameWrapper.gameNumber== gameId){
-                apiGameWrapper.move(newMove);
-                return;
-            }
+
+        if (gameId < 0 || gameId >= games.size()) {
+            throw new ResourceNotFoundException(String.format("gane number %d does not exist", gameId));
         }
-        throw new ResourceNotFoundException(String.format("game number %d does not exist", gameId));
+        MazeGame game = games.get((int)gameId);
+        if (newMove.equals("MOVE_CATS")) {
+            game.moveCat();
+            doWonOrLost(game);
+        } else {
+            doPlayerMove(newMove, game);
+        }
     }
 
     @PutMapping("games/{id}/increaseSpeed")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void increaseCatSpeed(@PathVariable("id") int id) {
-        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
-            if(apiGameWrapper.gameNumber== id){
-                apiGameWrapper.decreaseTimeInterval();
-                return;
-            }
+    public void increaseCatSpeed(@PathVariable("id") int gameId) {
+        if (gameId < 0 || gameId >= games.size()) {
+            throw new ResourceNotFoundException(String.format("gane number %d does not exist", gameId));
         }
+        MazeGame game = games.get(gameId);
+        ThreadsMain.increaseCatSpeed(game);
+
+//        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
+//            if(apiGameWrapper.gameNumber== id){
+//                apiGameWrapper.decreaseTimeInterval();
+//                return;
+//            }
+//        }
     }
 
     @PutMapping("games/{id}/decreaseSpeed")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void decreaseCatSpeed(@PathVariable("id") int id) {
-        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
-            if(apiGameWrapper.gameNumber== id){
-                apiGameWrapper.increaseTimeInterval();
-                return;
-            }
+    public void decreaseCatSpeed(@PathVariable("id") int gameId) {
+//        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
+//            if(apiGameWrapper.gameNumber== id){
+//                apiGameWrapper.increaseTimeInterval();
+//                return;
+//            }
+//        }
+
+        if (gameId < 0 || gameId >= games.size()) {
+            throw new ResourceNotFoundException(String.format("gane number %d does not exist", gameId));
         }
+        MazeGame game = games.get(gameId);
+        ThreadsMain.decreaseCatSpeed(game);
     }
 
     @PostMapping("games/{id}/cheatstate")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void showBoard(@PathVariable("id") int id,
             @RequestBody String newMove) {
-        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
-            if(apiGameWrapper.gameNumber== id){
-                if (newMove.equals("SHOW_ALL")) {
-                    apiGameWrapper.revealBoard();
-                }
-                return;
-            }
+        if (id < 0 || id >= games.size()) {
+            throw new ResourceNotFoundException(String.format("gane number %d does not exist", id));
+        }
+        if (newMove.equals("SHOW_ALL")) {
+            MazeGame game = games.get(id);
+            game.displayBoard();
         }
     }
 
@@ -148,5 +161,49 @@ Return 404 (File Not Found) if the requested game does not exist.
     @ExceptionHandler(IllegalArgumentException.class)
     public void badIdExceptionHandler() {
         // Nothing to do
+    }
+
+    private static Direction getPlayerMove(String newMove) {
+//        System.out.println(newMove);
+        switch (newMove) {
+            case "MOVE_LEFT":
+                return Direction.MOVE_LEFT;
+            case "MOVE_UP":
+                return Direction.MOVE_UP;
+            case "MOVE_RIGHT":
+                return Direction.MOVE_RIGHT;
+            case "MOVE_DOWN":
+                return Direction.MOVE_DOWN;
+            default:
+                throw new BadRequestException("NoSuchMove");
+        }
+    }
+
+    private void doPlayerMove(String arrow, MazeGame game) {
+        Direction move = getPlayerMove(arrow);
+        if (!game.isValidPlayerMove(move)) {
+            throw new InvalidMoveException("new location on the wall");
+        } else {
+            game.recordPlayerMove(move);
+            doWonOrLost(game);
+        }
+    }
+    private boolean gameNotWonOrLost(MazeGame game) {
+        return !game.hasUserWon() && !game.hasUserLost();
+    }
+
+    private void doWonOrLost(MazeGame game) {
+//        System.out.println("called");
+        if (game.hasUserWon()) {
+            revealBoard(game);
+        } else if (game.hasUserLost()) {
+            revealBoard(game);
+        } else {
+            assert false;
+        }
+    }
+
+    private void revealBoard(MazeGame game) {
+        game.displayBoard();
     }
 }

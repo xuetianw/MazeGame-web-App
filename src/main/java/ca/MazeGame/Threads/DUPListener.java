@@ -1,4 +1,4 @@
-package ca.MazeGame.UDP;// Java program to illustrate Server side
+package ca.MazeGame.Threads;// Java program to illustrate Server side
 // Implementation using DatagramSocket
 import ca.MazeGame.Wrappers.ApiGameWrapper;
 import ca.MazeGame.model.Direction;
@@ -16,6 +16,8 @@ public class DUPListener implements Runnable
     private static final String COMMAND_RIGHT = "right\n";
     private static final String COMMAND_UP = "up\n";
     private static final String COMMAND_DOWN = "down\n";
+
+    private static final String COMMAND_SHAKE = "shake\n";
 
     public DUPListener() {
     }
