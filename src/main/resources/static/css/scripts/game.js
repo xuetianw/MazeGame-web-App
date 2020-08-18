@@ -16,6 +16,7 @@ const myAppObj = new Vue({
         cheatShowAll: sendShowAll,
         increaseCatSpeed:  sendIncreaseCatSpeed,
         decreaseCatSpeed:  sendDecreaseCatSpeed,
+        multiplayer : startMultiPlayer,
 
         locationMatches: function(loc, x, y) {
             return loc.x === x && loc.y === y;
@@ -44,8 +45,8 @@ window.addEventListener('keydown', function(e) {
 $(document).ready(function() {
     loadAbout();
     window.setInterval(function () {
-        loadGameBoard();
         loadGame();
+        loadGameBoard();
     }, 200);
 });
 
@@ -65,8 +66,9 @@ function loadAbout() {
 function makeNewGame() {
     axios.post('api/games', {})
         .then(function (response) {
-            console.log("POST new game returned:", response);
+            // console.log("POST new game returned:", response);
             myAppObj.game = response.data;
+
             // myAppObj.playersTurn = true;
             // loadGameBoard();
             alertOnWrongStatus("POST games", 201, response.status);
@@ -93,9 +95,9 @@ function loadGameBoard() {
         .then(function (response) {
             // console.log("Load Board returned: ", response);
             myAppObj.board = response.data;
-            // console.log(myAppObj.game.gameNumber)
 
             alertOnWrongStatus("GET board", 200, response.status);
+            // console.log("game.secondPlayerNumCheeseFound" + game.secondPlayerNumCheeseFound)
         })
         .catch(function (error) {
             console.log("Load Board ERROR: ", error);
@@ -186,8 +188,6 @@ function sendIncreaseCatSpeed() {
     axios.put('/api/games/' + myAppObj.game.gameNumber + "/increaseSpeed")
         .then(function (response) {
             // console.log("Cat move returned: ", response);
-            loadGameBoard();
-            loadGame();
         })
         .catch(function (error) {
             console.log("speed increase ERROR: ", error);
@@ -199,11 +199,17 @@ function sendDecreaseCatSpeed() {
     axios.put('/api/games/' + myAppObj.game.gameNumber + "/decreaseSpeed")
         .then(function (response) {
             // console.log("Cat move returned: ", response);
-            loadGameBoard();
-            loadGame();
         })
         .catch(function (error) {
             console.log("speed increase ERROR: ", error);
         });
 }
 
+function startMultiPlayer() {
+    axios.put('/api/games/' + myAppObj.game.gameNumber + "/multiPlayer")
+        .then(function (response) {
+        })
+        .catch(function (error) {
+            console.log("speed increase ERROR: ", error);
+        });
+}

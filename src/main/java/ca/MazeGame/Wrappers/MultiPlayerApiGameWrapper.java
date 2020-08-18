@@ -1,12 +1,12 @@
 package ca.MazeGame.Wrappers;
 
+import ca.MazeGame.MazeGames.MazeGame;
+import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
 import ca.MazeGame.exception.BadRequestException;
 import ca.MazeGame.exception.InvalidMoveException;
 import ca.MazeGame.model.Direction;
-import ca.MazeGame.MazeGames.MazeGame;
 
-public class ApiGameWrapper extends MoveUtility implements Runnable {
-
+public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  {
     public boolean isGameWon;
     public boolean isGameLost;
     public int numCheeseFound;
@@ -14,17 +14,20 @@ public class ApiGameWrapper extends MoveUtility implements Runnable {
     public Long gameNumber;
     private boolean threadStop = false;
 
+    public int secondPlayerNumCheeseFound;
 
-    public MazeGame game;
-    public ApiBoardWrapper apiBoardWrapper;
+    MultiPlayerMazeGame game;
+
+    public MultiPlayerApiBoardWrapper apiBoardWrapper;
     private int timeInterval = 1000;
 
 
-    public ApiGameWrapper(MazeGame game, long id) {
-        apiBoardWrapper = new ApiBoardWrapper(game);
+    public MultiPlayerApiGameWrapper(MultiPlayerMazeGame game, long id) {
+        apiBoardWrapper = new MultiPlayerApiBoardWrapper(game);
         this.game = game;
         gameNumber = id;
     }
+
 
 
     public int getTimeInterval() {
@@ -39,9 +42,10 @@ public class ApiGameWrapper extends MoveUtility implements Runnable {
         return game;
     }
 
-    public void setGame(MazeGame game) {
+    public void setGame(MultiPlayerMazeGame game) {
         this.game = game;
     }
+
 
     public boolean isThreadStop() {
         return threadStop;
@@ -97,7 +101,7 @@ public class ApiGameWrapper extends MoveUtility implements Runnable {
         if (game.hasUserWon()) {
             revealBoard();
         } else if (game.hasUserLost()) {
-			revealBoard();
+            revealBoard();
         } else {
             assert false;
         }
@@ -106,13 +110,16 @@ public class ApiGameWrapper extends MoveUtility implements Runnable {
         game.displayBoard();
     }
 
-    public ApiGameWrapper processMaze() {
+    public MultiPlayerApiGameWrapper processMaze() {
         isGameWon = game.hasUserWon();
         isGameLost = game.hasUserLost();
         numCheeseFound = game.getNumCheeseCollected();
         numCheeseGoal = MazeGame.getNumCheeseToCollect();
+
+        secondPlayerNumCheeseFound = game.secondPlayerCheeseCollected;
         return this;
     }
+
 
     public void decreaseTimeInterval() {
         if (timeInterval >= 200) {

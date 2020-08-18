@@ -1,15 +1,15 @@
 package ca.MazeGame.UDP;// Java program to illustrate Server side
 // Implementation using DatagramSocket
-import ca.MazeGame.Wrappers.ApiGameWrapper;
+import ca.MazeGame.Wrappers.MoveUtility;
 import ca.MazeGame.model.Direction;
-import ca.MazeGame.model.MazeGame;
+import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-public class DUPListener implements Runnable
+public class DUPListener extends MoveUtility implements Runnable
 {
     public static final int PORT = 1234;
     private static final String COMMAND_LEFT = "left\n";
@@ -17,20 +17,20 @@ public class DUPListener implements Runnable
     private static final String COMMAND_UP = "up\n";
     private static final String COMMAND_DOWN = "down\n";
 
+    public MultiPlayerMazeGame game;
+
     public DUPListener() {
     }
 
-    public MazeGame getGame() {
+    public MultiPlayerMazeGame getGame() {
         return game;
     }
 
-    public void setGame(MazeGame game) {
+    public void setGame(MultiPlayerMazeGame game) {
         this.game = game;
     }
 
-    public MazeGame game;
-
-    DUPListener(MazeGame game) {
+    DUPListener(MultiPlayerMazeGame game) {
         this.game = game;
     }
 
@@ -78,7 +78,7 @@ public class DUPListener implements Runnable
 
             System.out.println("Client :" + data(receive));
 
-            processCommand(data(receive).toString());
+            processIncomingCommand(data(receive).toString());
 
             // Exit the server if the client sends "bye"
             if (data(receive).toString().equals("bye"))
@@ -92,21 +92,27 @@ public class DUPListener implements Runnable
         }
     }
 
-    void processCommand(String commnad) {
+    void processIncomingCommand(String command) {
         String instruction = null;
-        if (commnad.equals(COMMAND_LEFT)) {
-            instruction = ApiGameWrapper.COMMAND_LEFT;
-            System.out.println("user move left");
-        } else if (commnad.equals(COMMAND_RIGHT)) {
-            instruction = ApiGameWrapper.COMMAND_RIGHT;
-        } else if (commnad.equals(COMMAND_UP)) {
-            instruction = ApiGameWrapper.COMMAND_UP;
-            System.out.println("user move up");
-        } else if (commnad.equals(COMMAND_DOWN)) {
-            instruction = ApiGameWrapper.COMMAND_DOWN;
-            System.out.println("user move down");
-        } else {
-            System.out.printf("cannot find the command %s \n", commnad);
+        switch (command) {
+            case COMMAND_LEFT:
+                instruction = MoveUtility.COMMAND_LEFT;
+                System.out.println("user move left");
+                break;
+            case COMMAND_RIGHT:
+                instruction = MoveUtility.COMMAND_RIGHT;
+                break;
+            case COMMAND_UP:
+                instruction = MoveUtility.COMMAND_UP;
+                System.out.println("user move up");
+                break;
+            case COMMAND_DOWN:
+                instruction = MoveUtility.COMMAND_DOWN;
+                System.out.println("user move down");
+                break;
+            default:
+                System.out.printf("cannot find the command %s \n", command);
+                break;
         }
 
         if (instruction != null) {
@@ -115,11 +121,11 @@ public class DUPListener implements Runnable
     }
 
     public void doPlayerMove(String arrow) {
-        Direction move = ApiGameWrapper.getPlayerMove(arrow);
+        Direction move = getPlayerMove(arrow);
         if (!game.isValidPlayerMove(move)) {
             System.out.println("new location on the wall");
         } else {
-            game.recordPlayerMove(move);
+            game.recordSecondPlayerMove(move);
             if (!gameNotWonOrLost()) {
 //                System.out.println("Cats won!");
                 doWonOrLost();
@@ -128,13 +134,13 @@ public class DUPListener implements Runnable
     }
 
     public boolean gameNotWonOrLost() {
-        return !game.hasUserWon() && !game.hasUserLost();
+        return !game.hasAnyUserWon() && !game.hasAnyUserLost();
     }
 
     public void doWonOrLost() {
-        if (game.hasUserWon()) {
+        if (game.hasAnyUserWon()) {
             revealBoard();
-        } else if (game.hasUserLost()) {
+        } else if (game.hasAnyUserLost()) {
             revealBoard();
         } else {
             assert false;

@@ -1,17 +1,22 @@
-package ca.MazeGame.model;
+package ca.MazeGame.MazeGames;
+
+import ca.MazeGame.model.Cat;
+import ca.MazeGame.model.CellLocation;
+import ca.MazeGame.model.Direction;
+import ca.MazeGame.model.Maze;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MazeGame {
     public static final int NUM_CHEESE_TO_COLLECT = 1;
-    private int numCheeseCollected;
+    protected int numCheeseCollected;
 
-    private static int boardWidth = 15;
-    private static int boardHeight = 15;
-    private final Maze maze = new Maze(boardWidth, boardHeight);
+    protected static int boardWidth = 15;
+    protected static int boardHeight = 15;
+    protected final Maze maze = new Maze(boardWidth, boardHeight);
 
-    private CellLocation cheeseLocation;
+    protected CellLocation cheeseLocation;
     public static CellLocation playerLocation;
 
 
@@ -68,21 +73,21 @@ public class MazeGame {
         placePlayer();
         placeNewCheeseOnBoard();
         placeCatsOnBoard();
-        setVisibleAroundPlayerCell();
+        setVisibleAroundPlayerCell(playerLocation);
     }
 
-    private void placePlayer() {
+    public void placePlayer() {
         playerLocation = new CellLocation(1, 1);
     }
 
-    private void setVisibleAroundPlayerCell() {
-        CellLocation up = playerLocation.getTargetLocation(Direction.MOVE_UP);
-        CellLocation down = playerLocation.getTargetLocation(Direction.MOVE_DOWN);
-        CellLocation right = playerLocation.getTargetLocation(Direction.MOVE_RIGHT);
-        CellLocation left = playerLocation.getTargetLocation(Direction.MOVE_LEFT);
+    public void setVisibleAroundPlayerCell(CellLocation location) {
+        CellLocation up = location.getTargetLocation(Direction.MOVE_UP);
+        CellLocation down = location.getTargetLocation(Direction.MOVE_DOWN);
+        CellLocation right = location.getTargetLocation(Direction.MOVE_RIGHT);
+        CellLocation left = location.getTargetLocation(Direction.MOVE_LEFT);
 
         // Current cell, Up, Down, Right, Left.
-        maze.recordCellVisible(playerLocation);
+        maze.recordCellVisible(location);
         maze.recordCellVisible(up);
         maze.recordCellVisible(down);
         maze.recordCellVisible(right);
@@ -95,7 +100,7 @@ public class MazeGame {
         maze.recordCellVisible(down.getTargetLocation(Direction.MOVE_LEFT));
     }
 
-    private void placeCatsOnBoard() {
+    protected void placeCatsOnBoard() {
         cats.clear();
         CellLocation cat;
         do {
@@ -126,7 +131,7 @@ public class MazeGame {
         assert isValidPlayerMove(move);
         playerLocation = playerLocation.getTargetLocation(move);
 
-        setVisibleAroundPlayerCell();
+        setVisibleAroundPlayerCell(playerLocation);
 
         // Compute goal states achieved
         if (isCheeseAtLocation(playerLocation)) {

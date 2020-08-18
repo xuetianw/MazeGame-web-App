@@ -17,28 +17,42 @@
 
         <!-- Manual buttons for control-->
         <p>
-            <button type="button" v-on:click="newGame()">W
+            <button v-on:click="newGame()">W
                 New Game
             </button>
             <span>
-                <button type="button" v-on:click="cheatShowAll()">
+                <button v-on:click="cheatShowAll()">
                     Cheat: Show All
                 </button>
-                <button type="button" v-on:click="increaseCatSpeed()">
+                <button v-on:click="increaseCatSpeed()">
                     Increase cat speed
                 </button>
-                <button type="button" v-on:click="decreaseCatSpeed()">
+                <button v-on:click="decreaseCatSpeed()">
                     Decrease cat speed
                 </button>
             </span>
+            <button v-on:click="multiplayer">
+                multiplayer
+            </button>
         </p>
 
-        <!-- Game state -->
-        <p v-if="game != null">
-            You have found {{game.numCheeseFound}} of {{game.numCheeseGoal}}!</p>
-        <p v-else>
-            No game information available; try creating a new game?
-        </p>
+<!--        &lt;!&ndash; Game state &ndash;&gt;-->
+<!--        <p v-if="game != null">You have found {{game.numCheeseFound}} of {{game.numCheeseGoal}}!</p>-->
+<!--        <p v-else>No game information available; try creating a new game?</p>-->
+
+
+        <template v-if="game == null">
+            <p>No game information available; try creating a new game?</p>
+        </template>
+        <template v-if="game != null">
+            <p>You have found {{game.numCheeseFound}} of {{game.numCheeseGoal}}!</p>
+            <template v-if="game.secondPlayerNumCheeseFound != null">
+                <p>second player has found {{game.secondPlayerNumCheeseFound}} of {{game.numCheeseGoal}}!
+            </template>
+        </template>
+
+
+
 
 
         <!-- Board -->
@@ -48,22 +62,22 @@
                     <td v-for="(isWall, colIdx) in row">
                         <div style="position: relative; left:0; top:0;">
                             <!-- Background -->
-                            <img v-if="!board.isVisible[rowIdx][colIdx]" src="empty.png"/>
-                            <img v-else-if="isWall" src="/wall.png" />
-                            <img v-else src="field.png"/>
+                            <img v-if="!board.isVisible[rowIdx][colIdx]" src="res/empty.png"/>
+                            <img v-else-if="isWall" src="res/wall.png" />
+                            <img v-else src="res/field.png"/>
 
                             <!-- Sprites: stack them on top of each other using relative position -->
                             <img v-if="locationMatches(board.cheeseLocation, colIdx, rowIdx)"
-                                 src="cookie.png" class="stack"/>
+                                 src="res/cookie.png" class="stack"/>
                             <div v-if="locationMatches(board.mouseLocation, colIdx, rowIdx)">
                                 <!-- Player image depends on if won/lost/playing -->
-                                <img v-if="game.isGameWon" src="smile.png" class="stack"/>
-                                <img v-else-if="game.isGameLost" src="/cancel.png" class="stack"/>
-                                <img v-else src="person.png" class="stack"/>
+                                <img v-if="game.isGameWon" src="res/smile.png" class="stack"/>
+                                <img v-else-if="game.isGameLost" src="res/cancel.png" class="stack"/>
+                                <img v-else src="res/person.png" class="stack"/>
                             </div>
                             <div v-for="catLoc in board.catLocations">
                                 <img v-if="locationMatches(catLoc, colIdx, rowIdx)"
-                                     src="/fox.png" class="stack"/>
+                                     src="res/fox.png" class="stack"/>
                             </div>
                         </div>
                     </td>

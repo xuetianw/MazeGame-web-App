@@ -1,9 +1,12 @@
 package ca.MazeGame.controllers;
 
+import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
+import ca.MazeGame.UDP.DUPListener;
 import ca.MazeGame.Wrappers.ApiBoardWrapper;
 import ca.MazeGame.Wrappers.ApiGameWrapper;
+import ca.MazeGame.Wrappers.MultiPlayerApiGameWrapper;
 import ca.MazeGame.exception.ResourceNotFoundException;
-import ca.MazeGame.model.*;
+import ca.MazeGame.MazeGames.MazeGame;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +20,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public class GameController {
     private AtomicLong nextId = new AtomicLong();
     private List<ApiGameWrapper> apiGameWrappers = new ArrayList<>();
+    private List<MultiPlayerApiGameWrapper> multiPlayerApiGameWrappers = new ArrayList<>();
+
+    DUPListener dupListener = new DUPListener();
+    Thread UDPThread;
 
 
     @GetMapping("about")
@@ -48,6 +55,25 @@ public class GameController {
         myThread.start();
         return apiGameWrapper.processMaze();
     }
+
+
+//    @PostMapping("/games")
+//    @ResponseStatus(HttpStatus.CREATED)
+//    public ApiGameWrapper postNewMultiPlayergame() throws SocketException {
+//        MultiPlayerMazeGame mazeGame = new MultiPlayerMazeGame();
+//        if (multiPlayerApiGameWrappers.size() != 0) {
+//            MultiPlayerApiGameWrapper apiGameWrapper =  multiPlayerApiGameWrappers.get(multiPlayerApiGameWrappers.size() - 1);
+//            MazeGame game = apiGameWrapper.getGame();
+//            if (!game.hasUserWon() && !game.hasUserLost()) {
+//                apiGameWrapper.setThreadStop(true);
+//            }
+//        }
+//        ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, nextId.incrementAndGet());
+//        apiGameWrappers.add(apiGameWrapper);
+//        Thread myThread = new Thread(apiGameWrapper);
+//        myThread.start();
+//        return apiGameWrapper.processMaze();
+//    }
 
     /*
         GET /api/games
