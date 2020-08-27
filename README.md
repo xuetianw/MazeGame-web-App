@@ -10,5 +10,8 @@ this is a Embedded c & web MazeGame application implemented using spring boot as
 
 https://www.youtube.com/watch?v=w5q0nAAb_kU&t=2s
 
+# multiplayer mode UI
+![alt text](Readme-Images/MultiplayerUI.png)
+
 # production on AWS cloud
 http://mazegamenew-env.eba-ru7ts3dm.ca-central-1.elasticbeanstalk.com/
