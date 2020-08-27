@@ -7,24 +7,32 @@ import ca.MazeGame.exception.InvalidMoveException;
 import ca.MazeGame.model.Direction;
 
 public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  {
+    public boolean isFirstPlayerWon;
+    public boolean isSecondPlayerWon;
+
+    public boolean isFirstPlayerLost;
+    public boolean isSecondPlayerLost;
+
     public boolean isGameWon;
+
     public boolean isGameLost;
-    public int numCheeseFound;
+    public int firstPlayerNumCheeseFound;
+    public int secondPlayerNumCheeseFound;
+
     public int numCheeseGoal;
     public Long gameNumber;
     private boolean threadStop = false;
 
-    public int secondPlayerNumCheeseFound;
 
-    MultiPlayerMazeGame game;
-
+    MultiPlayerMazeGame multiPlayerMazeGame;
     public MultiPlayerApiBoardWrapper apiBoardWrapper;
     private int timeInterval = 1000;
 
 
-    public MultiPlayerApiGameWrapper(MultiPlayerMazeGame game, long id) {
-        apiBoardWrapper = new MultiPlayerApiBoardWrapper(game);
-        this.game = game;
+
+    public MultiPlayerApiGameWrapper(MultiPlayerMazeGame multiPlayerMazeGame, long id) {
+        apiBoardWrapper = new MultiPlayerApiBoardWrapper(multiPlayerMazeGame);
+        this.multiPlayerMazeGame = multiPlayerMazeGame;
         gameNumber = id;
     }
 
@@ -38,12 +46,12 @@ public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  
         this.timeInterval = timeInterval;
     }
 
-    public MazeGame getGame() {
-        return game;
+    public MazeGame getMultiPlayerMazeGame() {
+        return multiPlayerMazeGame;
     }
 
-    public void setGame(MultiPlayerMazeGame game) {
-        this.game = game;
+    public void setMultiPlayerMazeGame(MultiPlayerMazeGame multiPlayerMazeGame) {
+        this.multiPlayerMazeGame = multiPlayerMazeGame;
     }
 
 
@@ -57,7 +65,7 @@ public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  
 
     public void move(String newMove) {
         if (newMove.equals("MOVE_CATS")) {
-            game.moveCat();
+            multiPlayerMazeGame.moveCat();
             doWonOrLost();
             return;
         }
@@ -66,10 +74,10 @@ public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  
 
     @Override
     public void run() {
-        while (!game.hasUserWon() && !game.hasUserLost() && !threadStop) {
+        while (!multiPlayerMazeGame.hasUserWon() && !multiPlayerMazeGame.hasUserLost() && !threadStop) {
 //            System.out.println(game.toString());
             try {
-                game.moveCat();
+                multiPlayerMazeGame.moveCat();
                 doWonOrLost();
                 Thread.sleep(timeInterval);
             } catch (InterruptedException e) {
@@ -80,10 +88,10 @@ public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  
 
     public void doPlayerMove(String arrow) {
         Direction move = getPlayerMove(arrow);
-        if (!game.isValidPlayerMove(move)) {
+        if (!multiPlayerMazeGame.isValidPlayerMove(move)) {
             throw new InvalidMoveException("new location on the wall");
         } else {
-            game.recordPlayerMove(move);
+            multiPlayerMazeGame.recordPlayerMove(move);
             if (!gameNotWonOrLost()) {
 //                System.out.println("Cats won!");
                 doWonOrLost();
@@ -93,48 +101,39 @@ public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  
 
 
     public boolean gameNotWonOrLost() {
-        return !game.hasUserWon() && !game.hasUserLost();
+        return !multiPlayerMazeGame.hasUserWon() && !multiPlayerMazeGame.hasUserLost();
     }
 
     public void doWonOrLost() {
 //        System.out.println("called");
-        if (game.hasUserWon()) {
+        if (multiPlayerMazeGame.hasUserWon()) {
             revealBoard();
-        } else if (game.hasUserLost()) {
+        } else if (multiPlayerMazeGame.hasUserLost()) {
             revealBoard();
         } else {
             assert false;
         }
     }
     public void revealBoard() {
-        game.displayBoard();
+        multiPlayerMazeGame.displayBoard();
     }
 
     public MultiPlayerApiGameWrapper processMaze() {
-        isGameWon = game.hasUserWon();
-        isGameLost = game.hasUserLost();
-        numCheeseFound = game.getNumCheeseCollected();
-        numCheeseGoal = MazeGame.getNumCheeseToCollect();
+        isFirstPlayerWon = multiPlayerMazeGame.hasUserWon();
+        isSecondPlayerWon = multiPlayerMazeGame.hasSecondPlayerWon();
 
-        secondPlayerNumCheeseFound = game.secondPlayerCheeseCollected;
+        isGameWon = isFirstPlayerWon || isSecondPlayerWon;
+
+        isFirstPlayerLost = multiPlayerMazeGame.hasUserLost();
+        isSecondPlayerLost = multiPlayerMazeGame.hasSecondPlayerLost();
+
+        isGameLost = isFirstPlayerLost || isSecondPlayerLost;
+
+        firstPlayerNumCheeseFound = multiPlayerMazeGame.getNumCheeseCollected();
+        secondPlayerNumCheeseFound = multiPlayerMazeGame.getSecondPlayerCheeseCollected();
+
+        numCheeseGoal = MazeGame.getNumCheeseToCollect();
         return this;
     }
 
-
-    public void decreaseTimeInterval() {
-        if (timeInterval >= 200) {
-            timeInterval -= 50;
-        } else {
-            throw new BadRequestException("the limit has been reached");
-        }
-
-    }
-
-    public void increaseTimeInterval() {
-        if (timeInterval <= 1000) {
-            timeInterval += 50;
-        } else {
-            throw new BadRequestException("the limit has been reached");
-        }
-    }
 }

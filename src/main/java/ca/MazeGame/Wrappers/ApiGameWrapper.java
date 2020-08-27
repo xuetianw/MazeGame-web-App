@@ -14,11 +14,9 @@ public class ApiGameWrapper extends MoveUtility implements Runnable {
     public Long gameNumber;
     private boolean threadStop = false;
 
-
     public MazeGame game;
     public ApiBoardWrapper apiBoardWrapper;
     private int timeInterval = 1000;
-
 
     public ApiGameWrapper(MazeGame game, long id) {
         apiBoardWrapper = new ApiBoardWrapper(game);

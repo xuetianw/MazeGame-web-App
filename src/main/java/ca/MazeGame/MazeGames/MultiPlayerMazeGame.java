@@ -7,7 +7,7 @@ import ca.MazeGame.model.Maze;
 public class MultiPlayerMazeGame extends MazeGame {
     public static final int NUM_CHEESE_TO_COLLECT = 5;
 
-    public int secondPlayerCheeseCollected;
+    private int secondPlayerCheeseCollected;
 
     public static CellLocation secondPlayerLocation;
 
@@ -61,4 +61,22 @@ public class MultiPlayerMazeGame extends MazeGame {
     private boolean isSecondPlayerAtLocation(CellLocation cell) {
         return secondPlayerLocation.equals(cell);
     }
+
+    public boolean hasSecondPlayerWon() {
+        return secondPlayerCheeseCollected >= NUM_CHEESE_TO_COLLECT;
+    }
+
+    public boolean hasSecondPlayerLost() {
+        return isCatAtLocation(secondPlayerLocation);
+    }
+
+
+    public int getSecondPlayerCheeseCollected() {
+        return secondPlayerCheeseCollected;
+    }
+
+    public void setSecondPlayerCheeseCollected(int secondPlayerCheeseCollected) {
+        this.secondPlayerCheeseCollected = secondPlayerCheeseCollected;
+    }
+
 }

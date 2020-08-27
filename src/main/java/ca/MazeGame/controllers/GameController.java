@@ -4,6 +4,7 @@ import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
 import ca.MazeGame.UDP.DUPListener;
 import ca.MazeGame.Wrappers.ApiBoardWrapper;
 import ca.MazeGame.Wrappers.ApiGameWrapper;
+import ca.MazeGame.Wrappers.MultiPlayerApiBoardWrapper;
 import ca.MazeGame.Wrappers.MultiPlayerApiGameWrapper;
 import ca.MazeGame.exception.ResourceNotFoundException;
 import ca.MazeGame.MazeGames.MazeGame;
@@ -19,8 +20,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @RequestMapping("/api")
 public class GameController {
     private AtomicLong nextId = new AtomicLong();
-    private List<ApiGameWrapper> apiGameWrappers = new ArrayList<>();
-    private List<MultiPlayerApiGameWrapper> multiPlayerApiGameWrappers = new ArrayList<>();
+    private List<ApiGameWrapper> gameWrappers = new ArrayList<>();
 
     DUPListener dupListener = new DUPListener();
     Thread UDPThread;
@@ -31,73 +31,32 @@ public class GameController {
         return "Hello from Fred Wu!";
     }
 
-    //2. Games
-/*
-    POST /api/games
-    Create a new game by POSTing to this end point. You need not post any data (no body).
-    Returns one fully populated ApiGameWrapper object instance.
-    Returns HTTP status code 201 (Created) when successful.
-    */
     @PostMapping("/games")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiGameWrapper postNewgame() throws SocketException {
         MazeGame mazeGame = new MazeGame();
-        if (apiGameWrappers.size() != 0) {
-            ApiGameWrapper apiGameWrapper =  apiGameWrappers.get(apiGameWrappers.size() - 1);
+        if (gameWrappers.size() != 0) {
+            ApiGameWrapper apiGameWrapper =  gameWrappers.get(gameWrappers.size() - 1);
             MazeGame game = apiGameWrapper.getGame();
             if (!game.hasUserWon() && !game.hasUserLost()) {
                 apiGameWrapper.setThreadStop(true);
             }
         }
         ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, nextId.incrementAndGet());
-        apiGameWrappers.add(apiGameWrapper);
+        gameWrappers.add(apiGameWrapper);
         Thread myThread = new Thread(apiGameWrapper);
         myThread.start();
         return apiGameWrapper.processMaze();
     }
 
-
-//    @PostMapping("/games")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public ApiGameWrapper postNewMultiPlayergame() throws SocketException {
-//        MultiPlayerMazeGame mazeGame = new MultiPlayerMazeGame();
-//        if (multiPlayerApiGameWrappers.size() != 0) {
-//            MultiPlayerApiGameWrapper apiGameWrapper =  multiPlayerApiGameWrappers.get(multiPlayerApiGameWrappers.size() - 1);
-//            MazeGame game = apiGameWrapper.getGame();
-//            if (!game.hasUserWon() && !game.hasUserLost()) {
-//                apiGameWrapper.setThreadStop(true);
-//            }
-//        }
-//        ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, nextId.incrementAndGet());
-//        apiGameWrappers.add(apiGameWrapper);
-//        Thread myThread = new Thread(apiGameWrapper);
-//        myThread.start();
-//        return apiGameWrapper.processMaze();
-//    }
-
-    /*
-        GET /api/games
-    Return a list of ApiGameWrapper objects for the games that the system knows about. Note that
-    once a game is created, the server does not need to ever delete that game: it can exist until the
-    server is restarted.
-    Each ApiGameWrapper stores an ID to uniquely identify the game. This ID is assigned by the
-    backend.
-    TIP: Make the ID the game’s index into the list which you use to store the games.
-     */
     @GetMapping("/games")
     public List<ApiGameWrapper> getGames() {
-        return apiGameWrappers;
+        return gameWrappers;
     }
 
-    /*
-    Return the ApiGameWrapper object for game 1 (where 1 is the game ID; 1 need not be the first ID
-assigned).
-Error Handling:
-Return 404 (File Not Found) if the requested game does not exist.
-     */
     @GetMapping("games/{id}")
-    public ApiGameWrapper getGames(@PathVariable("id") long gameId) {
-        for (ApiGameWrapper apiGameWrapper : apiGameWrappers) {
+    public ApiGameWrapper getGame(@PathVariable("id") long gameId) {
+        for (ApiGameWrapper apiGameWrapper : gameWrappers) {
             if (apiGameWrapper.gameNumber == gameId) {
                 return apiGameWrapper.processMaze();
             }
@@ -105,10 +64,9 @@ Return 404 (File Not Found) if the requested game does not exist.
         throw new ResourceNotFoundException(String.format("gane number %d does not exist", gameId));
     }
 
-//3. Board
     @GetMapping("/games/{id}/board")
     public ApiBoardWrapper getBoard(@PathVariable("id") int id) {
-        for (ApiGameWrapper apiGameWrapper : apiGameWrappers) {
+        for (ApiGameWrapper apiGameWrapper : gameWrappers) {
             if (apiGameWrapper.gameNumber == id) {
                 return apiGameWrapper.apiBoardWrapper.processMaze();
             }
@@ -120,7 +78,7 @@ Return 404 (File Not Found) if the requested game does not exist.
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void makeMove(@PathVariable("id") int gameId,
                          @RequestBody String newMove) {
-        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
+        for(ApiGameWrapper apiGameWrapper : gameWrappers) {
             if(apiGameWrapper.gameNumber== gameId){
                 apiGameWrapper.move(newMove);
                 return;
@@ -132,7 +90,7 @@ Return 404 (File Not Found) if the requested game does not exist.
     @PutMapping("games/{id}/increaseSpeed")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void increaseCatSpeed(@PathVariable("id") int id) {
-        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
+        for(ApiGameWrapper apiGameWrapper : gameWrappers) {
             if(apiGameWrapper.gameNumber== id){
                 apiGameWrapper.decreaseTimeInterval();
                 return;
@@ -143,7 +101,7 @@ Return 404 (File Not Found) if the requested game does not exist.
     @PutMapping("games/{id}/decreaseSpeed")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void decreaseCatSpeed(@PathVariable("id") int id) {
-        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
+        for(ApiGameWrapper apiGameWrapper : gameWrappers) {
             if(apiGameWrapper.gameNumber== id){
                 apiGameWrapper.increaseTimeInterval();
                 return;
@@ -155,7 +113,7 @@ Return 404 (File Not Found) if the requested game does not exist.
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void showBoard(@PathVariable("id") int id,
             @RequestBody String newMove) {
-        for(ApiGameWrapper apiGameWrapper : apiGameWrappers) {
+        for(ApiGameWrapper apiGameWrapper : gameWrappers) {
             if(apiGameWrapper.gameNumber== id){
                 if (newMove.equals("SHOW_ALL")) {
                     apiGameWrapper.revealBoard();
@@ -164,8 +122,6 @@ Return 404 (File Not Found) if the requested game does not exist.
             }
         }
     }
-
-
 
 
     // Create Exception Handle

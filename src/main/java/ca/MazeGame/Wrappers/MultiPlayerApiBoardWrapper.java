@@ -11,27 +11,21 @@ import java.util.List;
 public class MultiPlayerApiBoardWrapper {
     public int boardWidth;
     public int boardHeight;
-    public ApiLocationWrapper mouseLocation;
-    public ApiLocationWrapper secondMouseLocation;
+    public ApiLocationWrapper firstUserLocation;
+    public ApiLocationWrapper secondUserLocation;
     public ApiLocationWrapper cheeseLocation;
     public List<ApiLocationWrapper> catLocations;
     public boolean[][] hasWalls;
     public boolean[][] isVisible;
-    MultiPlayerMazeGame game;
+    public MultiPlayerMazeGame game;
 
     public MultiPlayerApiBoardWrapper(MultiPlayerMazeGame game) {
         setWidths();
         this.game = game;
-        placeMouse();
-        placeCheese();
-        setVisibilityArray();
-        place_cat();
-        place_wall();
-        placeSecondMouse();
     }
 
     private void placeSecondMouse() {
-        secondMouseLocation = ApiLocationWrapper.makeFromCellLocation(MultiPlayerMazeGame.secondPlayerLocation);
+        secondUserLocation = ApiLocationWrapper.makeFromCellLocation(MultiPlayerMazeGame.secondPlayerLocation);
     }
 
     private void setWidths() {
@@ -49,7 +43,7 @@ public class MultiPlayerApiBoardWrapper {
     }
 
     private void placeMouse() {
-        this.mouseLocation = ApiLocationWrapper.makeFromCellLocation(MazeGame.playerLocation);
+        this.firstUserLocation = ApiLocationWrapper.makeFromCellLocation(MazeGame.playerLocation);
     }
 
     private void placeCheese() {
@@ -80,6 +74,7 @@ public class MultiPlayerApiBoardWrapper {
         setVisibilityArray();
         place_cat();
         place_wall();
+        placeSecondMouse();
         return this;
     }
 }
