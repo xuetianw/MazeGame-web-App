@@ -15,67 +15,162 @@
     <div id="gameApp">
         <p>Welcome to the Maze Game, written by <strong>{{authorName}}</strong>.</p>
 
-        <!-- Manual buttons for control-->
-        <p>
-            <button type="button" v-on:click="newGame()">W
-                New Game
-            </button>
-            <span>
-                <button type="button" v-on:click="cheatShowAll()">
+
+        <template v-if="gameMode === null">
+            <!-- Manual buttons for control-->
+            <p>
+                <button v-on:click="newGame()">
+                    single player Game
+                </button>
+                <button v-on:click="multiplayer()">
+                    start multiplayer Game
+                </button>
+                <span>
+                <button v-on:click="cheatShowAll()">
                     Cheat: Show All
                 </button>
-                <button type="button" v-on:click="increaseCatSpeed()">
+                <button v-on:click="increaseCatSpeed()">
                     Increase cat speed
                 </button>
-                <button type="button" v-on:click="decreaseCatSpeed()">
+                <button v-on:click="decreaseCatSpeed()">
                     Decrease cat speed
                 </button>
             </span>
-        </p>
+            </p>
 
-        <!-- Game state -->
-        <p v-if="game != null">
-            You have found {{game.numCheeseFound}} of {{game.numCheeseGoal}}!</p>
-        <p v-else>
-            No game information available; try creating a new game?
-        </p>
+            <p>No game information available; try creating a new game?</p>
+
+        </template>
+
+        <template v-if="gameMode === 'single'">
+            <!-- Manual buttons for control-->
+            <p>
+                <button v-on:click="newGame()">
+                    single player Game
+                </button>
+                <button v-on:click="multiplayer()">
+                    start multiplayer Game
+                </button>
+                <span>
+                <button v-on:click="cheatShowAll()">
+                    Cheat: Show All
+                </button>
+                <button v-on:click="increaseCatSpeed()">
+                    Increase cat speed
+                </button>
+                <button v-on:click="decreaseCatSpeed()">
+                    Decrease cat speed
+                </button>
+            </span>
+            </p>
+
+            <p>You have found {{game.numCheeseFound}} of {{game.numCheeseGoal}}!</p>
+            <template v-if="game.secondPlayerNumCheeseFound != null">
+                <p>second player has found {{game.secondPlayerNumCheeseFound}} of {{game.numCheeseGoal}}!
+            </template>
+
+        </template>
+
+        <template v-if="gameMode === 'multiple'">
+            <!-- Manual buttons for control-->
+            <p>
+                <button v-on:click="newGame()">
+                    start single player Game
+                </button>
+                <button v-on:click="multiplayer()">
+                    start multiplayer Game
+                </button>
+                <span>
+            </span>
+            </p>
+        </template>
 
 
         <!-- Board -->
-        <div v-if="board != null">
-            <table>
-                <tr v-for="(row, rowIdx) in board.hasWalls">
-                    <td v-for="(isWall, colIdx) in row">
-                        <div style="position: relative; left:0; top:0;">
-                            <!-- Background -->
-                            <img v-if="!board.isVisible[rowIdx][colIdx]" src="empty.png"/>
-                            <img v-else-if="isWall" src="/wall.png" />
-                            <img v-else src="field.png"/>
+        <template v-if="gameMode === 'single'">
+            <div v-if="board != null">
+                <table>
+                    <tr v-for="(row, rowIdx) in board.hasWalls">
+                        <td v-for="(isWall, colIdx) in row">
+                            <div style="position: relative; left:0; top:0;">
+                                <!-- Background -->
+                                <img v-if="!board.isVisible[rowIdx][colIdx]" src="res/empty.png"/>
+                                <img v-else-if="isWall" src="res/wall.png" />
+                                <img v-else src="res/field.png"/>
 
-                            <!-- Sprites: stack them on top of each other using relative position -->
-                            <img v-if="locationMatches(board.cheeseLocation, colIdx, rowIdx)"
-                                 src="cookie.png" class="stack"/>
-                            <div v-if="locationMatches(board.mouseLocation, colIdx, rowIdx)">
-                                <!-- Player image depends on if won/lost/playing -->
-                                <img v-if="game.isGameWon" src="smile.png" class="stack"/>
-                                <img v-else-if="game.isGameLost" src="/cancel.png" class="stack"/>
-                                <img v-else src="person.png" class="stack"/>
+                                <!-- Sprites: stack them on top of each other using relative position -->
+                                <img v-if="locationMatches(board.cheeseLocation, colIdx, rowIdx)"
+                                     src="res/cookie.png" class="stack"/>
+
+                                <div v-if="locationMatches(board.mouseLocation, colIdx, rowIdx)">
+                                    <!-- Player image depends on if won/lost/playing -->
+                                    <img v-if="game.isGameWon" src="res/smile.png" class="stack"/>
+                                    <img v-else-if="game.isGameLost" src="res/cancel.png" class="stack"/>
+                                    <img v-else src="res/person.png" class="stack"/>
+                                </div>
+
+                                <div v-for="catLoc in board.catLocations">
+                                    <img v-if="locationMatches(catLoc, colIdx, rowIdx)"
+                                         src="res/fox.png" class="stack"/>
+                                </div>
                             </div>
-                            <div v-for="catLoc in board.catLocations">
-                                <img v-if="locationMatches(catLoc, colIdx, rowIdx)"
-                                     src="/fox.png" class="stack"/>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Won / loss -->
+                <h1 v-if="game.isGameWon">YOU WON! Congratulations!</h1>
+                <h1 v-if="game.isGameLost">YOU LOST! Try again?</h1>
+            </div>
+        </template>
+
+        <template v-if="gameMode === 'multiple'">
+            <div v-if="multiplayerBoard != null">
+                <table>
+                    <tr v-for="(row, rowIdx) in multiplayerBoard.hasWalls">
+                        <td v-for="(isWall, colIdx) in row">
+                            <div style="position: relative; left:0; top:0;">
+                                <!-- Background -->
+                                <img v-if="!multiplayerBoard.isVisible[rowIdx][colIdx]" src="res/empty.png"/>
+                                <img v-else-if="isWall" src="res/wall.png" />
+                                <img v-else src="res/field.png"/>
+
+                                <!-- Sprites: stack them on top of each other using relative position -->
+                                <img v-if="locationMatches(multiplayerBoard.cheeseLocation, colIdx, rowIdx)"
+                                     src="res/cookie.png" class="stack"/>
+
+                                <div v-if="locationMatches(multiplayerBoard.firstUserLocation, colIdx, rowIdx)">
+                                    <!-- Player image depends on if won/lost/playing -->
+                                    <img v-if="multiplayerGame.isFirstPlayerWon" src="res/smile.png" class="stack"/>
+                                    <img v-else-if="multiplayerGame.isFirstPlayerLost" src="res/cancel.png" class="stack"/>
+                                    <img v-else src="res/person.png" class="stack"/>
+                                </div>
+
+                                <div v-if="locationMatches(multiplayerBoard.secondUserLocation, colIdx, rowIdx)">
+                                    <!-- Player image depends on if won/lost/playing -->
+                                    <img v-if="multiplayerGame.isSecondPlayerWon" src="res/smile.png" class="stack"/>
+                                    <img v-else-if="multiplayerGame.isSecondPlayerLost" src="res/cancel.png" class="stack"/>
+                                    <img v-else src="res/second-player.png" class="stack"/>
+                                </div>
+
+                                <div v-for="catLoc in multiplayerBoard.catLocations">
+                                    <img v-if="locationMatches(catLoc, colIdx, rowIdx)"
+                                         src="res/fox.png" class="stack"/>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
+                        </td>
+                    </tr>
+                </table>
 
-            <!-- Won / loss -->
-            <h1 v-if="game.isGameWon">YOU WON! Congratulations!</h1>
-            <h1 v-if="game.isGameLost">YOU LOST! Try again?</h1>
+                <!-- Won / loss -->
+                <h1 v-if="multiplayerGame.isFirstPlayerWon">Player One WON! Congratulations!</h1>
+                <h1 v-if="multiplayerGame.isFirstPlayerLost">Player One LOST!</h1>
 
+                <h1 v-if="multiplayerGame.isSecondPlayerWon">PlayerTwo WON! Congratulations!</h1>
+                <h1 v-if="multiplayerGame.isSecondPlayerLost">Player Two LOST!</h1>
 
-        </div>
+            </div>
+        </template>
     </div>
 
 

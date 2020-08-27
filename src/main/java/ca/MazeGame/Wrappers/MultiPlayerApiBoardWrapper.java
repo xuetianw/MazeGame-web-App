@@ -1,25 +1,31 @@
 package ca.MazeGame.Wrappers;
 
+import ca.MazeGame.MazeGames.MazeGame;
+import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
 import ca.MazeGame.model.Cat;
 import ca.MazeGame.model.CellLocation;
-import ca.MazeGame.MazeGames.MazeGame;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ApiBoardWrapper {
+public class MultiPlayerApiBoardWrapper {
     public int boardWidth;
     public int boardHeight;
-    public ApiLocationWrapper mouseLocation;
+    public ApiLocationWrapper firstUserLocation;
+    public ApiLocationWrapper secondUserLocation;
     public ApiLocationWrapper cheeseLocation;
     public List<ApiLocationWrapper> catLocations;
     public boolean[][] hasWalls;
     public boolean[][] isVisible;
-    private MazeGame game;
+    public MultiPlayerMazeGame game;
 
-    public ApiBoardWrapper(MazeGame game) {
+    public MultiPlayerApiBoardWrapper(MultiPlayerMazeGame game) {
         setWidths();
         this.game = game;
+    }
+
+    private void placeSecondMouse() {
+        secondUserLocation = ApiLocationWrapper.makeFromCellLocation(MultiPlayerMazeGame.secondPlayerLocation);
     }
 
     private void setWidths() {
@@ -37,7 +43,7 @@ public class ApiBoardWrapper {
     }
 
     private void placeMouse() {
-        this.mouseLocation = ApiLocationWrapper.makeFromCellLocation(MazeGame.playerLocation);
+        this.firstUserLocation = ApiLocationWrapper.makeFromCellLocation(MazeGame.playerLocation);
     }
 
     private void placeCheese() {
@@ -62,12 +68,13 @@ public class ApiBoardWrapper {
         }
     }
 
-    public ApiBoardWrapper processMaze() {
+    public MultiPlayerApiBoardWrapper processMaze() {
         placeMouse();
         placeCheese();
         setVisibilityArray();
         place_cat();
         place_wall();
+        placeSecondMouse();
         return this;
     }
 }

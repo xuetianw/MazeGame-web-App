@@ -3,10 +3,9 @@ package ca.MazeGame.Wrappers;
 import ca.MazeGame.exception.BadRequestException;
 import ca.MazeGame.exception.InvalidMoveException;
 import ca.MazeGame.model.Direction;
-import ca.MazeGame.model.MazeGame;
+import ca.MazeGame.MazeGames.MazeGame;
 
-
-public class ApiGameWrapper implements Runnable {
+public class ApiGameWrapper extends MoveUtility implements Runnable {
 
     public boolean isGameWon;
     public boolean isGameLost;
@@ -15,15 +14,9 @@ public class ApiGameWrapper implements Runnable {
     public Long gameNumber;
     private boolean threadStop = false;
 
-
     public MazeGame game;
     public ApiBoardWrapper apiBoardWrapper;
     private int timeInterval = 1000;
-
-    public static final String COMMAND_LEFT = "MOVE_LEFT";
-    public static final String COMMAND_RIGHT = "MOVE_RIGHT";
-    public static final String COMMAND_UP = "MOVE_UP";
-    public static final String COMMAND_DOWN = "MOVE_DOWN";
 
     public ApiGameWrapper(MazeGame game, long id) {
         apiBoardWrapper = new ApiBoardWrapper(game);
@@ -92,21 +85,7 @@ public class ApiGameWrapper implements Runnable {
         }
     }
 
-    public static Direction getPlayerMove(String newMove) {
-//        System.out.println(newMove);
-        switch (newMove) {
-            case "MOVE_LEFT":
-                return Direction.MOVE_LEFT;
-            case "MOVE_UP":
-                return Direction.MOVE_UP;
-            case "MOVE_RIGHT":
-                return Direction.MOVE_RIGHT;
-            case "MOVE_DOWN":
-                return Direction.MOVE_DOWN;
-            default:
-                throw new BadRequestException("NoSuchMove");
-        }
-    }
+
     public boolean gameNotWonOrLost() {
         return !game.hasUserWon() && !game.hasUserLost();
     }
