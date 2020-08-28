@@ -6,6 +6,8 @@ import ca.MazeGame.exception.BadRequestException;
 import ca.MazeGame.exception.InvalidMoveException;
 import ca.MazeGame.model.Direction;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  {
     public boolean isFirstPlayerWon;
     public boolean isSecondPlayerWon;
@@ -28,7 +30,7 @@ public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  
     public MultiPlayerApiBoardWrapper apiBoardWrapper;
     private int timeInterval = 1000;
 
-
+    private ReentrantLock moveLock = new ReentrantLock();
 
     public MultiPlayerApiGameWrapper(MultiPlayerMazeGame multiPlayerMazeGame, long id) {
         apiBoardWrapper = new MultiPlayerApiBoardWrapper(multiPlayerMazeGame);
@@ -65,11 +67,20 @@ public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  
 
     public void move(String newMove) {
         if (newMove.equals("MOVE_CATS")) {
+            moveLock.lock();
+
             multiPlayerMazeGame.moveCat();
             doWonOrLost();
+
+            moveLock.unlock();
             return;
         }
+
+        moveLock.lock();
+
         doPlayerMove(newMove);
+
+        moveLock.unlock();
     }
 
     @Override
@@ -89,7 +100,9 @@ public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  
     public void doPlayerMove(String arrow) {
         Direction move = getPlayerMove(arrow);
         if (!multiPlayerMazeGame.isValidPlayerMove(move)) {
-            throw new InvalidMoveException("new location on the wall");
+            RuntimeException copy = new InvalidMoveException("new location on the wall");
+            moveLock.unlock();
+            throw copy;
         } else {
             multiPlayerMazeGame.recordPlayerMove(move);
             if (!gameNotWonOrLost()) {

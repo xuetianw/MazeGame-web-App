@@ -12,14 +12,15 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 @RestController
 @RequestMapping("/api")
 public class MultiPlayerGameController {
     private AtomicLong nextId = new AtomicLong();
     private List<MultiPlayerApiGameWrapper> multiPlayerGameWrappers = new ArrayList<>();
-
-
+    ReentrantLock computeLock = new ReentrantLock();
+    ReentrantLock moveLock = new ReentrantLock();
 
     @PostMapping("/multiPlayerGames")
     @ResponseStatus(HttpStatus.CREATED)
@@ -42,22 +43,30 @@ public class MultiPlayerGameController {
 
     @GetMapping("multiPlayerGames/{id}")
     public MultiPlayerApiGameWrapper getMultiPlayerGame(@PathVariable("id") long gameId) {
+        computeLock.lock();
         for (MultiPlayerApiGameWrapper multiPlayerApiGameWrapper : multiPlayerGameWrappers) {
             if (multiPlayerApiGameWrapper.gameNumber == gameId) {
-                return multiPlayerApiGameWrapper.processMaze();
+                MultiPlayerApiGameWrapper copy = multiPlayerApiGameWrapper.processMaze();
+                computeLock.unlock();
+                return copy;
             }
         }
+        computeLock.unlock();
         throw new ResourceNotFoundException(String.format("gane number %d does not exist", gameId));
     }
 
 
     @GetMapping("/multiPlayerGames/{id}/board")
     public MultiPlayerApiBoardWrapper getMultiPlayerGameBoard(@PathVariable("id") int id) {
+        computeLock.lock();
         for (MultiPlayerApiGameWrapper multiPlayerApiGameWrapper : multiPlayerGameWrappers) {
             if (multiPlayerApiGameWrapper.gameNumber == id) {
-                return multiPlayerApiGameWrapper.apiBoardWrapper.processMaze();
+                MultiPlayerApiBoardWrapper copy = multiPlayerApiGameWrapper.apiBoardWrapper.processMaze();
+                computeLock.unlock();
+                return copy;
             }
         }
+        computeLock.unlock();
         throw new ResourceNotFoundException(String.format("board number %d does not exist", id));
     }
 
@@ -66,12 +75,15 @@ public class MultiPlayerGameController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void makeMultiPlayerMove(@PathVariable("id") int gameId,
                                     @RequestBody String newMove) {
+//        moveLock.lock();
         for(MultiPlayerApiGameWrapper multiPlayerApiGameWrapper : multiPlayerGameWrappers) {
             if(multiPlayerApiGameWrapper.gameNumber== gameId){
                 multiPlayerApiGameWrapper.move(newMove);
+//                moveLock.unlock();
                 return;
             }
         }
+//        moveLock.unlock();
         throw new ResourceNotFoundException(String.format("game number %d does not exist", gameId));
     }
 }

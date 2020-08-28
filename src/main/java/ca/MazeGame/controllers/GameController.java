@@ -1,11 +1,8 @@
 package ca.MazeGame.controllers;
 
-import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
 import ca.MazeGame.UDP.DUPListener;
 import ca.MazeGame.Wrappers.ApiBoardWrapper;
 import ca.MazeGame.Wrappers.ApiGameWrapper;
-import ca.MazeGame.Wrappers.MultiPlayerApiBoardWrapper;
-import ca.MazeGame.Wrappers.MultiPlayerApiGameWrapper;
 import ca.MazeGame.exception.ResourceNotFoundException;
 import ca.MazeGame.MazeGames.MazeGame;
 import org.springframework.http.HttpStatus;
@@ -15,12 +12,15 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 @RestController
 @RequestMapping("/api")
 public class GameController {
     private AtomicLong nextId = new AtomicLong();
     private List<ApiGameWrapper> gameWrappers = new ArrayList<>();
+    ReentrantLock computeLock = new ReentrantLock();
+    ReentrantLock moveLock = new ReentrantLock();
 
     DUPListener dupListener = new DUPListener();
     Thread UDPThread;
@@ -37,7 +37,7 @@ public class GameController {
         MazeGame mazeGame = new MazeGame();
         if (gameWrappers.size() != 0) {
             ApiGameWrapper apiGameWrapper =  gameWrappers.get(gameWrappers.size() - 1);
-            MazeGame game = apiGameWrapper.getGame();
+            MazeGame game = apiGameWrapper.getSingleUserGame();
             if (!game.hasUserWon() && !game.hasUserLost()) {
                 apiGameWrapper.setThreadStop(true);
             }
@@ -56,21 +56,29 @@ public class GameController {
 
     @GetMapping("games/{id}")
     public ApiGameWrapper getGame(@PathVariable("id") long gameId) {
+        computeLock.lock();
         for (ApiGameWrapper apiGameWrapper : gameWrappers) {
             if (apiGameWrapper.gameNumber == gameId) {
-                return apiGameWrapper.processMaze();
+                ApiGameWrapper copy = apiGameWrapper.processMaze();
+                computeLock.unlock();
+                return copy;
             }
         }
+        computeLock.unlock();
         throw new ResourceNotFoundException(String.format("gane number %d does not exist", gameId));
     }
 
     @GetMapping("/games/{id}/board")
     public ApiBoardWrapper getBoard(@PathVariable("id") int id) {
+        computeLock.lock();
         for (ApiGameWrapper apiGameWrapper : gameWrappers) {
             if (apiGameWrapper.gameNumber == id) {
-                return apiGameWrapper.apiBoardWrapper.processMaze();
+                ApiBoardWrapper copy = apiGameWrapper.apiBoardWrapper.processMaze();
+                computeLock.unlock();
+                return copy;
             }
         }
+        computeLock.unlock();
         throw new ResourceNotFoundException(String.format("board number %d does not exist", id));
     }
 
