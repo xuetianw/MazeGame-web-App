@@ -144,6 +144,7 @@ function loadGameBoard() {
             .then(function (response) {
                 // console.log("Load Board returned: ", response);
                 myAppObj.board = response.data;
+                // console.log(myAppObj.game.gameNumber);
 
                 // alertOnWrongStatus("GET board", 200, response.status);
                 // console.log("game.secondPlayerNumCheeseFound" + game.secondPlayerNumCheeseFound)
@@ -158,7 +159,6 @@ function loadGameBoard() {
             .then(function (response) {
                 // console.log("Load Board returned: ", response);
                 myAppObj.multiplayerBoard = response.data;
-
                 // console.log(myAppObj.multiplayerBoard)
                 // console.log("1111111111111111111111111")
                 // console.log(myAppObj.board)

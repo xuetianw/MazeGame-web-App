@@ -2,7 +2,6 @@ package ca.MazeGame.MazeGames;
 
 import ca.MazeGame.model.CellLocation;
 import ca.MazeGame.model.Direction;
-import ca.MazeGame.model.Maze;
 
 public class MultiPlayerMazeGame extends MazeGame {
     public static final int NUM_CHEESE_TO_COLLECT = 5;
@@ -32,6 +31,7 @@ public class MultiPlayerMazeGame extends MazeGame {
             secondPlayerCheeseCollected++;
             placeNewCheeseOnBoard();
         }
+//        recordMoveLock.unlock();
 
     }
 

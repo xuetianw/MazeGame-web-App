@@ -5,6 +5,8 @@ import ca.MazeGame.exception.InvalidMoveException;
 import ca.MazeGame.model.Direction;
 import ca.MazeGame.MazeGames.MazeGame;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 public class ApiGameWrapper extends MoveUtility implements Runnable {
 
     public boolean isGameWon;
@@ -14,13 +16,15 @@ public class ApiGameWrapper extends MoveUtility implements Runnable {
     public Long gameNumber;
     private boolean threadStop = false;
 
-    public MazeGame game;
+    private ReentrantLock moveLock = new ReentrantLock();
+
+    public MazeGame singleUserGame;
     public ApiBoardWrapper apiBoardWrapper;
     private int timeInterval = 1000;
 
-    public ApiGameWrapper(MazeGame game, long id) {
-        apiBoardWrapper = new ApiBoardWrapper(game);
-        this.game = game;
+    public ApiGameWrapper(MazeGame singleUserGame, long id) {
+        apiBoardWrapper = new ApiBoardWrapper(singleUserGame);
+        this.singleUserGame = singleUserGame;
         gameNumber = id;
     }
 
@@ -33,12 +37,12 @@ public class ApiGameWrapper extends MoveUtility implements Runnable {
         this.timeInterval = timeInterval;
     }
 
-    public MazeGame getGame() {
-        return game;
+    public MazeGame getSingleUserGame() {
+        return singleUserGame;
     }
 
-    public void setGame(MazeGame game) {
-        this.game = game;
+    public void setSingleUserGame(MazeGame singleUserGame) {
+        this.singleUserGame = singleUserGame;
     }
 
     public boolean isThreadStop() {
@@ -51,19 +55,27 @@ public class ApiGameWrapper extends MoveUtility implements Runnable {
 
     public void move(String newMove) {
         if (newMove.equals("MOVE_CATS")) {
-            game.moveCat();
+            moveLock.lock();
+
+            singleUserGame.moveCat();
             doWonOrLost();
+
+            moveLock.unlock();
             return;
         }
+        moveLock.lock();
+
         doPlayerMove(newMove);
+
+        moveLock.unlock();
     }
 
     @Override
     public void run() {
-        while (!game.hasUserWon() && !game.hasUserLost() && !threadStop) {
+        while (!singleUserGame.hasUserWon() && !singleUserGame.hasUserLost() && !threadStop) {
 //            System.out.println(game.toString());
             try {
-                game.moveCat();
+                singleUserGame.moveCat();
                 doWonOrLost();
                 Thread.sleep(timeInterval);
             } catch (InterruptedException e) {
@@ -74,10 +86,12 @@ public class ApiGameWrapper extends MoveUtility implements Runnable {
 
     public void doPlayerMove(String arrow) {
         Direction move = getPlayerMove(arrow);
-        if (!game.isValidPlayerMove(move)) {
-            throw new InvalidMoveException("new location on the wall");
+        if (!singleUserGame.isValidPlayerMove(move)) {
+            RuntimeException copy = new InvalidMoveException("new location on the wall");
+            moveLock.unlock();
+            throw copy;
         } else {
-            game.recordPlayerMove(move);
+            singleUserGame.recordPlayerMove(move);
             if (!gameNotWonOrLost()) {
 //                System.out.println("Cats won!");
                 doWonOrLost();
@@ -87,27 +101,27 @@ public class ApiGameWrapper extends MoveUtility implements Runnable {
 
 
     public boolean gameNotWonOrLost() {
-        return !game.hasUserWon() && !game.hasUserLost();
+        return !singleUserGame.hasUserWon() && !singleUserGame.hasUserLost();
     }
 
     public void doWonOrLost() {
 //        System.out.println("called");
-        if (game.hasUserWon()) {
+        if (singleUserGame.hasUserWon()) {
             revealBoard();
-        } else if (game.hasUserLost()) {
+        } else if (singleUserGame.hasUserLost()) {
 			revealBoard();
         } else {
             assert false;
         }
     }
     public void revealBoard() {
-        game.displayBoard();
+        singleUserGame.displayBoard();
     }
 
     public ApiGameWrapper processMaze() {
-        isGameWon = game.hasUserWon();
-        isGameLost = game.hasUserLost();
-        numCheeseFound = game.getNumCheeseCollected();
+        isGameWon = singleUserGame.hasUserWon();
+        isGameLost = singleUserGame.hasUserLost();
+        numCheeseFound = singleUserGame.getNumCheeseCollected();
         numCheeseGoal = MazeGame.getNumCheeseToCollect();
         return this;
     }
