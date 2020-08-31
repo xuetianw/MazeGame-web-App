@@ -1,5 +1,6 @@
 package ca.MazeGame.controllers;
 
+import ca.MazeGame.SInglePlayerThreads.MazeGameThreadObj;
 import ca.MazeGame.UDP.DUPListener;
 import ca.MazeGame.Wrappers.ApiBoardWrapper;
 import ca.MazeGame.Wrappers.ApiGameWrapper;
@@ -17,10 +18,10 @@ import java.util.concurrent.locks.ReentrantLock;
 @RestController
 @RequestMapping("/api")
 public class GameController {
+    private List<MazeGameThreadObj> mazeGameThreadObjs = new ArrayList<>();
+
     private AtomicLong nextId = new AtomicLong();
-    private List<ApiGameWrapper> gameWrappers = new ArrayList<>();
     ReentrantLock computeLock = new ReentrantLock();
-    ReentrantLock moveLock = new ReentrantLock();
 
     DUPListener dupListener = new DUPListener();
     Thread UDPThread;
@@ -34,32 +35,37 @@ public class GameController {
     @PostMapping("/games")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiGameWrapper postNewgame() throws SocketException {
+        ReentrantLock lock = new ReentrantLock();
+        lock.lock();
+
         MazeGame mazeGame = new MazeGame();
-        if (gameWrappers.size() != 0) {
-            ApiGameWrapper apiGameWrapper =  gameWrappers.get(gameWrappers.size() - 1);
-            MazeGame game = apiGameWrapper.getSingleUserGame();
+        if (mazeGameThreadObjs.size() != 0) {
+            MazeGameThreadObj mazeGameThreadObj =  mazeGameThreadObjs.get(mazeGameThreadObjs.size() - 1);
+            MazeGame game = mazeGameThreadObj.getSingleUserGame();
             if (!game.hasUserWon() && !game.hasUserLost()) {
-                apiGameWrapper.setThreadStop(true);
+                mazeGameThreadObj.getMainControl().stopThreads();
             }
         }
-        ApiGameWrapper apiGameWrapper = new ApiGameWrapper(mazeGame, nextId.incrementAndGet());
-        gameWrappers.add(apiGameWrapper);
-        Thread myThread = new Thread(apiGameWrapper);
-        myThread.start();
-        return apiGameWrapper.processMaze();
+        long id = nextId.incrementAndGet();
+        MazeGameThreadObj mazeGameThreadObj = new MazeGameThreadObj(mazeGame, id);
+        mazeGameThreadObjs.add(mazeGameThreadObj);
+        ApiGameWrapper copy = ApiGameWrapper.processMaze(mazeGame, id);
+
+        lock.unlock();
+        return copy;
     }
 
-    @GetMapping("/games")
-    public List<ApiGameWrapper> getGames() {
-        return gameWrappers;
-    }
+//    @GetMapping("/games")
+//    public List<ApiGameWrapper> getGames() {
+//        return gameWrappers;
+//    }
 
     @GetMapping("games/{id}")
     public ApiGameWrapper getGame(@PathVariable("id") long gameId) {
         computeLock.lock();
-        for (ApiGameWrapper apiGameWrapper : gameWrappers) {
-            if (apiGameWrapper.gameNumber == gameId) {
-                ApiGameWrapper copy = apiGameWrapper.processMaze();
+        for (MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
+            if (mazeGameThreadObj.gameNumber == gameId) {
+                ApiGameWrapper copy = ApiGameWrapper.processMaze(mazeGameThreadObj.getSingleUserGame(), gameId);
                 computeLock.unlock();
                 return copy;
             }
@@ -71,9 +77,9 @@ public class GameController {
     @GetMapping("/games/{id}/board")
     public ApiBoardWrapper getBoard(@PathVariable("id") int id) {
         computeLock.lock();
-        for (ApiGameWrapper apiGameWrapper : gameWrappers) {
-            if (apiGameWrapper.gameNumber == id) {
-                ApiBoardWrapper copy = apiGameWrapper.apiBoardWrapper.processMaze();
+        for (MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
+            if (mazeGameThreadObj.gameNumber == id) {
+                ApiBoardWrapper copy = ApiGameWrapper.apiBoardWrapper.processMaze();
                 computeLock.unlock();
                 return copy;
             }
@@ -86,9 +92,9 @@ public class GameController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void makeMove(@PathVariable("id") int gameId,
                          @RequestBody String newMove) {
-        for(ApiGameWrapper apiGameWrapper : gameWrappers) {
-            if(apiGameWrapper.gameNumber== gameId){
-                apiGameWrapper.move(newMove);
+        for(MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
+            if(mazeGameThreadObj.gameNumber == gameId){
+                mazeGameThreadObj.getMainControl().move(newMove);
                 return;
             }
         }
@@ -98,9 +104,9 @@ public class GameController {
     @PutMapping("games/{id}/increaseSpeed")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void increaseCatSpeed(@PathVariable("id") int id) {
-        for(ApiGameWrapper apiGameWrapper : gameWrappers) {
-            if(apiGameWrapper.gameNumber== id){
-                apiGameWrapper.decreaseTimeInterval();
+        for(MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
+            if(mazeGameThreadObj.gameNumber== id){
+                mazeGameThreadObj.getMainControl().decreaseTimeInterval();
                 return;
             }
         }
@@ -109,9 +115,9 @@ public class GameController {
     @PutMapping("games/{id}/decreaseSpeed")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void decreaseCatSpeed(@PathVariable("id") int id) {
-        for(ApiGameWrapper apiGameWrapper : gameWrappers) {
-            if(apiGameWrapper.gameNumber== id){
-                apiGameWrapper.increaseTimeInterval();
+        for(MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
+            if(mazeGameThreadObj.gameNumber== id){
+                mazeGameThreadObj.getMainControl().increaseTimeInterval();
                 return;
             }
         }
@@ -121,10 +127,10 @@ public class GameController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void showBoard(@PathVariable("id") int id,
             @RequestBody String newMove) {
-        for(ApiGameWrapper apiGameWrapper : gameWrappers) {
-            if(apiGameWrapper.gameNumber== id){
+        for(MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
+            if(mazeGameThreadObj.gameNumber== id){
                 if (newMove.equals("SHOW_ALL")) {
-                    apiGameWrapper.revealBoard();
+                    mazeGameThreadObj.getMainControl().revealBoard();
                 }
                 return;
             }

@@ -79,4 +79,13 @@ public class MultiPlayerMazeGame extends MazeGame {
         this.secondPlayerCheeseCollected = secondPlayerCheeseCollected;
     }
 
+    public static int getNumCheeseToCollect() {
+        return NUM_CHEESE_TO_COLLECT;
+    }
+
+    @Override
+    public boolean hasUserWon() {
+        boolean collectedEnoughCheese = numCheeseCollected >= NUM_CHEESE_TO_COLLECT;
+        return !hasUserLost() && collectedEnoughCheese;
+    }
 }

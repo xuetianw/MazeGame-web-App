@@ -2,13 +2,13 @@ package ca.MazeGame.controllers;
 
 import ca.MazeGame.MazeGames.MazeGame;
 import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
+import ca.MazeGame.MultiPlayersThreads.MultiPLayerMazeGameThreadObj;
 import ca.MazeGame.Wrappers.MultiPlayerApiBoardWrapper;
 import ca.MazeGame.Wrappers.MultiPlayerApiGameWrapper;
 import ca.MazeGame.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -17,36 +17,43 @@ import java.util.concurrent.locks.ReentrantLock;
 @RestController
 @RequestMapping("/api")
 public class MultiPlayerGameController {
+    private List<MultiPLayerMazeGameThreadObj> mazeGameThreadsListObjs = new ArrayList<>();
+
     private AtomicLong nextId = new AtomicLong();
-    private List<MultiPlayerApiGameWrapper> multiPlayerGameWrappers = new ArrayList<>();
     ReentrantLock computeLock = new ReentrantLock();
     ReentrantLock moveLock = new ReentrantLock();
 
     @PostMapping("/multiPlayerGames")
     @ResponseStatus(HttpStatus.CREATED)
-    public MultiPlayerApiGameWrapper postNewMultiPlayergame() throws SocketException {
+    public MultiPlayerApiGameWrapper postNewMultiPlayerGame() {
+        ReentrantLock lock = new ReentrantLock();
+        lock.lock();
+
         MultiPlayerMazeGame mazeGame = new MultiPlayerMazeGame();
-        if (multiPlayerGameWrappers.size() != 0) {
-            MultiPlayerApiGameWrapper apiGameWrapper =  multiPlayerGameWrappers.get(multiPlayerGameWrappers.size() - 1);
-            MazeGame game = apiGameWrapper.getMultiPlayerMazeGame();
+        if (mazeGameThreadsListObjs.size() != 0) {
+            MultiPLayerMazeGameThreadObj multiPLayerMazeGameThreadObj =  mazeGameThreadsListObjs.get(mazeGameThreadsListObjs.size() - 1);
+            MazeGame game = multiPLayerMazeGameThreadObj.getMultiPlayerMazeGame();
             if (!game.hasUserWon() && !game.hasUserLost()) {
-                apiGameWrapper.setThreadStop(true);
+                multiPLayerMazeGameThreadObj.getMultiPlayersMainControl().stopThreads();
             }
         }
-        MultiPlayerApiGameWrapper multiPlayerApiGameWrapper = new MultiPlayerApiGameWrapper(mazeGame, nextId.incrementAndGet());
-        multiPlayerGameWrappers.add(multiPlayerApiGameWrapper);
-        Thread myThread = new Thread(multiPlayerApiGameWrapper);
-        myThread.start();
-        return multiPlayerApiGameWrapper.processMaze();
+        long id = nextId.incrementAndGet();
+        MultiPLayerMazeGameThreadObj multiPLayerMazeGameThreadObj = new MultiPLayerMazeGameThreadObj(mazeGame, id);
+        mazeGameThreadsListObjs.add(multiPLayerMazeGameThreadObj);
+        MultiPlayerApiGameWrapper copy = MultiPlayerApiGameWrapper.processMaze(mazeGame, id);
+
+        lock.unlock();
+        return copy;
     }
 
 
     @GetMapping("multiPlayerGames/{id}")
     public MultiPlayerApiGameWrapper getMultiPlayerGame(@PathVariable("id") long gameId) {
         computeLock.lock();
-        for (MultiPlayerApiGameWrapper multiPlayerApiGameWrapper : multiPlayerGameWrappers) {
-            if (multiPlayerApiGameWrapper.gameNumber == gameId) {
-                MultiPlayerApiGameWrapper copy = multiPlayerApiGameWrapper.processMaze();
+        for (MultiPLayerMazeGameThreadObj multiPLayerMazeGameThreadObj : mazeGameThreadsListObjs) {
+            if (multiPLayerMazeGameThreadObj.gameNumber == gameId) {
+                MultiPlayerApiGameWrapper copy =
+                        MultiPlayerApiGameWrapper.processMaze(multiPLayerMazeGameThreadObj.getMultiPlayerMazeGame(), gameId);
                 computeLock.unlock();
                 return copy;
             }
@@ -59,9 +66,9 @@ public class MultiPlayerGameController {
     @GetMapping("/multiPlayerGames/{id}/board")
     public MultiPlayerApiBoardWrapper getMultiPlayerGameBoard(@PathVariable("id") int id) {
         computeLock.lock();
-        for (MultiPlayerApiGameWrapper multiPlayerApiGameWrapper : multiPlayerGameWrappers) {
-            if (multiPlayerApiGameWrapper.gameNumber == id) {
-                MultiPlayerApiBoardWrapper copy = multiPlayerApiGameWrapper.apiBoardWrapper.processMaze();
+        for (MultiPLayerMazeGameThreadObj multiPLayerMazeGameThreadObj : mazeGameThreadsListObjs) {
+            if (multiPLayerMazeGameThreadObj.gameNumber == id) {
+                MultiPlayerApiBoardWrapper copy = MultiPlayerApiGameWrapper.apiBoardWrapper.processMaze();
                 computeLock.unlock();
                 return copy;
             }
@@ -75,15 +82,12 @@ public class MultiPlayerGameController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void makeMultiPlayerMove(@PathVariable("id") int gameId,
                                     @RequestBody String newMove) {
-//        moveLock.lock();
-        for(MultiPlayerApiGameWrapper multiPlayerApiGameWrapper : multiPlayerGameWrappers) {
-            if(multiPlayerApiGameWrapper.gameNumber== gameId){
-                multiPlayerApiGameWrapper.move(newMove);
-//                moveLock.unlock();
+        for(MultiPLayerMazeGameThreadObj multiPLayerMazeGameThreadObj : mazeGameThreadsListObjs) {
+            if(multiPLayerMazeGameThreadObj.gameNumber== gameId){
+                multiPLayerMazeGameThreadObj.getMultiPlayersMainControl().move(newMove);
                 return;
             }
         }
-//        moveLock.unlock();
         throw new ResourceNotFoundException(String.format("game number %d does not exist", gameId));
     }
 }

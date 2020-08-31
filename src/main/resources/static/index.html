@@ -65,9 +65,6 @@
             </p>
 
             <p>You have found {{game.numCheeseFound}} of {{game.numCheeseGoal}}!</p>
-            <template v-if="game.secondPlayerNumCheeseFound != null">
-                <p>second player has found {{game.secondPlayerNumCheeseFound}} of {{game.numCheeseGoal}}!
-            </template>
 
         </template>
 
@@ -125,6 +122,11 @@
         </template>
 
         <template v-if="gameMode === 'multiple'">
+            <p>You have found {{multiplayerGame.firstPlayerNumCheeseFound}} of {{multiplayerGame.numCheeseGoal}}!</p>
+            <template v-if="multiplayerGame.secondPlayerNumCheeseFound != null">
+                <p>second player has found {{multiplayerGame.secondPlayerNumCheeseFound}} of {{multiplayerGame.numCheeseGoal}}!
+            </template>
+
             <div v-if="multiplayerBoard != null">
                 <table>
                     <tr v-for="(row, rowIdx) in multiplayerBoard.hasWalls">
@@ -161,6 +163,8 @@
                         </td>
                     </tr>
                 </table>
+
+
 
                 <!-- Won / loss -->
                 <h1 v-if="multiplayerGame.isFirstPlayerWon">Player One WON! Congratulations!</h1>
