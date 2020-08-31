@@ -125,7 +125,7 @@ public class DUPListener extends MoveUtility implements Runnable
         if (!game.isValidPlayerMove(move)) {
             System.out.println("new location on the wall");
         } else {
-            game.recordSecondPlayerMove(move);
+//            game.recordSecondPlayerMove(move);
             if (!gameNotWonOrLost()) {
 //                System.out.println("Cats won!");
                 doWonOrLost();

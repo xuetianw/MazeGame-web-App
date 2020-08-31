@@ -2,38 +2,47 @@ package ca.MazeGame.MazeGames;
 
 import ca.MazeGame.model.CellLocation;
 import ca.MazeGame.model.Direction;
+import ca.MazeGame.model.PCPlayer;
 
 public class MultiPlayerMazeGame extends MazeGame {
     public static final int NUM_CHEESE_TO_COLLECT = 5;
 
     private int secondPlayerCheeseCollected;
 
-    public static CellLocation secondPlayerLocation;
+    private PCPlayer pcPlayer;
+
+    public PCPlayer getPcPlayer() {
+        return pcPlayer;
+    }
+
+    public void setPcPlayer(PCPlayer pcPlayer) {
+        this.pcPlayer = pcPlayer;
+    }
 
     public MultiPlayerMazeGame() {
         super();
         placeSecondPlayer();
-        setVisibleAroundPlayerCell(secondPlayerLocation);
+//        setVisibleAroundPlayerCell(secondPlayerLocation);
     }
 
     public void placeSecondPlayer() {
-        secondPlayerLocation = new CellLocation(boardWidth - 2, boardHeight - 2);
+        pcPlayer = new PCPlayer(this, new CellLocation(boardWidth - 2, boardHeight - 2));
     }
 
-    public void recordSecondPlayerMove(Direction move) {
-        assert isValidSecondPlayerMove(move);
-        secondPlayerLocation = secondPlayerLocation.getTargetLocation(move);
-
-        setVisibleAroundPlayerCell(secondPlayerLocation);
-
-        // Compute goal states achieved
-        if (isCheeseAtLocation(secondPlayerLocation)) {
-            secondPlayerCheeseCollected++;
-            placeNewCheeseOnBoard();
-        }
-//        recordMoveLock.unlock();
-
-    }
+//    public void recordSecondPlayerMove(Direction move) {
+//        assert isValidSecondPlayerMove(move);
+//        pcPlayer.setLocation(pcPlayer.getLocation().getTargetLocation(move));
+//
+////        setVisibleAroundPlayerCell(secondPlayerLocation);
+//
+//        // Compute goal states achieved
+//        if (isCheeseAtLocation(pcPlayer.getLocation())) {
+//            secondPlayerCheeseCollected++;
+//            placeNewCheeseOnBoard();
+//        }
+////        recordMoveLock.unlock();
+//
+//    }
 
     private void placeNewCheeseOnBoard() {
         do {
@@ -44,7 +53,7 @@ public class MultiPlayerMazeGame extends MazeGame {
 
 
     public boolean isValidSecondPlayerMove(Direction move) {
-        CellLocation targetLocation = secondPlayerLocation.getTargetLocation(move);
+        CellLocation targetLocation = pcPlayer.getLocation().getTargetLocation(move);
         return maze.isCellOpen(targetLocation);
     }
 
@@ -55,11 +64,11 @@ public class MultiPlayerMazeGame extends MazeGame {
     }
 
     public boolean hasAnyUserLost() {
-        return isCatAtLocation(playerLocation) || isCatAtLocation(secondPlayerLocation);
+        return isCatAtLocation(playerLocation) || isCatAtLocation(pcPlayer.getLocation());
     }
 
     private boolean isSecondPlayerAtLocation(CellLocation cell) {
-        return secondPlayerLocation.equals(cell);
+        return pcPlayer.getLocation().equals(cell);
     }
 
     public boolean hasSecondPlayerWon() {
@@ -67,7 +76,7 @@ public class MultiPlayerMazeGame extends MazeGame {
     }
 
     public boolean hasSecondPlayerLost() {
-        return isCatAtLocation(secondPlayerLocation);
+        return isCatAtLocation(pcPlayer.getLocation());
     }
 
 
@@ -83,9 +92,22 @@ public class MultiPlayerMazeGame extends MazeGame {
         return NUM_CHEESE_TO_COLLECT;
     }
 
+
+    public CellLocation getCheeseLocation() {
+        return cheeseLocation;
+    }
+
+    public void setCheeseLocation(CellLocation cheeseLocation) {
+        this.cheeseLocation = cheeseLocation;
+    }
+
     @Override
     public boolean hasUserWon() {
         boolean collectedEnoughCheese = numCheeseCollected >= NUM_CHEESE_TO_COLLECT;
         return !hasUserLost() && collectedEnoughCheese;
+    }
+
+    public void movePCPlayer() {
+        //Todo
     }
 }

@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @RestController
 @RequestMapping("/api")
 public class MultiPlayerGameController {
-    private List<MultiPLayerMazeGameThreadObj> mazeGameThreadsListObjs = new ArrayList<>();
+    private final List<MultiPLayerMazeGameThreadObj> mazeGameThreadsListObjs = new ArrayList<>();
 
     private AtomicLong nextId = new AtomicLong();
     ReentrantLock computeLock = new ReentrantLock();
