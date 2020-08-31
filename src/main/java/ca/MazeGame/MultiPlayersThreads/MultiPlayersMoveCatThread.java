@@ -6,11 +6,10 @@ import ca.MazeGame.Wrappers.MoveUtility;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MultiPlayersMoveCatThread extends MoveUtility implements Runnable {
-    private MultiPlayerMazeGame multiPlayerMazeGame;
+    private final MultiPlayerMazeGame multiPlayerMazeGame;
 
     private int timeInterval = 1000;
     private boolean threadStop = false;
-    private ReentrantLock moveLock = new ReentrantLock();
 
     public MultiPlayersMoveCatThread(MultiPlayerMazeGame multiPlayerMazeGame) {
         this.multiPlayerMazeGame = multiPlayerMazeGame;

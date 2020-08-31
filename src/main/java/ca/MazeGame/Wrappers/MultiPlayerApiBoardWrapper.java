@@ -17,15 +17,15 @@ public class MultiPlayerApiBoardWrapper {
     public List<ApiLocationWrapper> catLocations;
     public boolean[][] hasWalls;
     public boolean[][] isVisible;
-    public MazeGame game;
+    public MultiPlayerMazeGame game;
 
-    public MultiPlayerApiBoardWrapper(MazeGame game) {
+    public MultiPlayerApiBoardWrapper(MultiPlayerMazeGame game) {
         setWidths();
         this.game = game;
     }
 
     private void placeSecondMouse() {
-        secondUserLocation = ApiLocationWrapper.makeFromCellLocation(MultiPlayerMazeGame.secondPlayerLocation);
+        secondUserLocation = ApiLocationWrapper.makeFromCellLocation(game.getPcPlayer().getLocation());
     }
 
     private void setWidths() {

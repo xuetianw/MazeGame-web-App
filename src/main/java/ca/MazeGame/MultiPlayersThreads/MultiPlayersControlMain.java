@@ -12,14 +12,20 @@ public class MultiPlayersControlMain extends MoveUtility {
     private MultiPlayerMazeGame multiPlayerMazeGame;
     private ReentrantLock moveLock = new ReentrantLock();
 
-
     MultiPlayersMoveCatThread moveCatTask;
+    MovePCPlayerThread movePCPlayerTask;
 
     public MultiPlayersControlMain(MultiPlayerMazeGame multiPlayerMazeGame) {
         this.multiPlayerMazeGame = multiPlayerMazeGame;
         moveCatTask = new MultiPlayersMoveCatThread(multiPlayerMazeGame);
         Thread moveCatThread = new Thread(moveCatTask);
         moveCatThread.start();
+
+        movePCPlayerTask = new MovePCPlayerThread(multiPlayerMazeGame);
+
+        Thread movePCPlayerThread = new Thread(movePCPlayerTask);
+        movePCPlayerThread.start();
+
     }
 
 

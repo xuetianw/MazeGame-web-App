@@ -19,6 +19,8 @@ public class MazeGame {
     protected CellLocation cheeseLocation;
     public static CellLocation playerLocation;
 
+    private final List<Cat> cats = new ArrayList<>();
+
 
     public CellLocation getCheeseLocation() {
         return cheeseLocation;
@@ -61,8 +63,6 @@ public class MazeGame {
     public List<Cat> getCats() {
         return cats;
     }
-
-    public final List<Cat> cats = new ArrayList<>();
 
     public Maze getMaze() {
         return maze;
