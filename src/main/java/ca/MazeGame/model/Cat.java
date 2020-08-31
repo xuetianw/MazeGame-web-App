@@ -1,6 +1,7 @@
 package ca.MazeGame.model;
 
 import ca.MazeGame.MazeGames.MazeGame;
+import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
 
 import java.util.ArrayList;
 import java.util.Collections;

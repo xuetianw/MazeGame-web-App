@@ -17,9 +17,9 @@ public class MultiPlayerApiBoardWrapper {
     public List<ApiLocationWrapper> catLocations;
     public boolean[][] hasWalls;
     public boolean[][] isVisible;
-    public MultiPlayerMazeGame game;
+    public MazeGame game;
 
-    public MultiPlayerApiBoardWrapper(MultiPlayerMazeGame game) {
+    public MultiPlayerApiBoardWrapper(MazeGame game) {
         setWidths();
         this.game = game;
     }

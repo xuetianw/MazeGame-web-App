@@ -8,7 +8,7 @@ import ca.MazeGame.model.Direction;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  {
+public class MultiPlayerApiGameWrapper extends MoveUtility {
     public boolean isFirstPlayerWon;
     public boolean isSecondPlayerWon;
 
@@ -23,130 +23,24 @@ public class MultiPlayerApiGameWrapper extends MoveUtility implements Runnable  
 
     public int numCheeseGoal;
     public Long gameNumber;
-    private boolean threadStop = false;
 
+    public static MultiPlayerApiBoardWrapper apiBoardWrapper;
 
-    MultiPlayerMazeGame multiPlayerMazeGame;
-    public MultiPlayerApiBoardWrapper apiBoardWrapper;
-    private int timeInterval = 1000;
-
-    private ReentrantLock moveLock = new ReentrantLock();
-
-    public MultiPlayerApiGameWrapper(MultiPlayerMazeGame multiPlayerMazeGame, long id) {
+    public static MultiPlayerApiGameWrapper processMaze(MultiPlayerMazeGame multiPlayerMazeGame, long id) {
         apiBoardWrapper = new MultiPlayerApiBoardWrapper(multiPlayerMazeGame);
-        this.multiPlayerMazeGame = multiPlayerMazeGame;
-        gameNumber = id;
+
+        MultiPlayerApiGameWrapper multiPlayerApiGameWrapper = new MultiPlayerApiGameWrapper();
+        multiPlayerApiGameWrapper.gameNumber = id;
+        multiPlayerApiGameWrapper.isFirstPlayerWon = multiPlayerMazeGame.hasUserWon();
+        multiPlayerApiGameWrapper.isSecondPlayerWon = multiPlayerMazeGame.hasSecondPlayerWon();
+        multiPlayerApiGameWrapper.isGameWon = multiPlayerApiGameWrapper.isFirstPlayerWon || multiPlayerApiGameWrapper.isSecondPlayerWon;
+        multiPlayerApiGameWrapper.isFirstPlayerLost = multiPlayerMazeGame.hasUserLost();
+        multiPlayerApiGameWrapper.isSecondPlayerLost = multiPlayerMazeGame.hasSecondPlayerLost();
+        multiPlayerApiGameWrapper.isGameLost = multiPlayerApiGameWrapper.isFirstPlayerLost || multiPlayerApiGameWrapper.isSecondPlayerLost;
+        multiPlayerApiGameWrapper.firstPlayerNumCheeseFound = multiPlayerMazeGame.getNumCheeseCollected();
+        multiPlayerApiGameWrapper.secondPlayerNumCheeseFound = multiPlayerMazeGame.getSecondPlayerCheeseCollected();
+        multiPlayerApiGameWrapper.numCheeseGoal = MultiPlayerMazeGame.getNumCheeseToCollect();
+
+        return multiPlayerApiGameWrapper;
     }
-
-
-
-    public int getTimeInterval() {
-        return timeInterval;
-    }
-
-    public void setTimeInterval(int timeInterval) {
-        this.timeInterval = timeInterval;
-    }
-
-    public MazeGame getMultiPlayerMazeGame() {
-        return multiPlayerMazeGame;
-    }
-
-    public void setMultiPlayerMazeGame(MultiPlayerMazeGame multiPlayerMazeGame) {
-        this.multiPlayerMazeGame = multiPlayerMazeGame;
-    }
-
-
-    public boolean isThreadStop() {
-        return threadStop;
-    }
-
-    public void setThreadStop(boolean threadStop) {
-        this.threadStop = threadStop;
-    }
-
-    public void move(String newMove) {
-        if (newMove.equals("MOVE_CATS")) {
-            moveLock.lock();
-
-            multiPlayerMazeGame.moveCat();
-            doWonOrLost();
-
-            moveLock.unlock();
-            return;
-        }
-
-        moveLock.lock();
-
-        doPlayerMove(newMove);
-
-        moveLock.unlock();
-    }
-
-    @Override
-    public void run() {
-        while (!multiPlayerMazeGame.hasUserWon() && !multiPlayerMazeGame.hasUserLost() && !threadStop) {
-//            System.out.println(game.toString());
-            try {
-                multiPlayerMazeGame.moveCat();
-                doWonOrLost();
-                Thread.sleep(timeInterval);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void doPlayerMove(String arrow) {
-        Direction move = getPlayerMove(arrow);
-        if (!multiPlayerMazeGame.isValidPlayerMove(move)) {
-            RuntimeException copy = new InvalidMoveException("new location on the wall");
-            moveLock.unlock();
-            throw copy;
-        } else {
-            multiPlayerMazeGame.recordPlayerMove(move);
-            if (!gameNotWonOrLost()) {
-//                System.out.println("Cats won!");
-                doWonOrLost();
-            }
-        }
-    }
-
-
-    public boolean gameNotWonOrLost() {
-        return !multiPlayerMazeGame.hasUserWon() && !multiPlayerMazeGame.hasUserLost();
-    }
-
-    public void doWonOrLost() {
-//        System.out.println("called");
-        if (multiPlayerMazeGame.hasUserWon()) {
-            revealBoard();
-        } else if (multiPlayerMazeGame.hasUserLost()) {
-            revealBoard();
-        } else {
-            assert false;
-        }
-    }
-    public void revealBoard() {
-        multiPlayerMazeGame.displayBoard();
-    }
-
-    public MultiPlayerApiGameWrapper processMaze() {
-        isFirstPlayerWon = multiPlayerMazeGame.hasUserWon();
-        isSecondPlayerWon = multiPlayerMazeGame.hasSecondPlayerWon();
-
-        isGameWon = isFirstPlayerWon || isSecondPlayerWon;
-
-        isFirstPlayerLost = multiPlayerMazeGame.hasUserLost();
-        isSecondPlayerLost = multiPlayerMazeGame.hasSecondPlayerLost();
-
-        isGameLost = isFirstPlayerLost || isSecondPlayerLost;
-
-        firstPlayerNumCheeseFound = multiPlayerMazeGame.getNumCheeseCollected();
-        secondPlayerNumCheeseFound = multiPlayerMazeGame.getSecondPlayerCheeseCollected();
-
-        numCheeseGoal = MazeGame.getNumCheeseToCollect();
-        return this;
-    }
-
 }
