@@ -16,15 +16,6 @@ public class MoveCatThread implements Runnable {
         this.singleUserGame = mazeGame;
     }
 
-
-    public int getTimeInterval() {
-        return timeInterval;
-    }
-
-    public void setTimeInterval(int timeInterval) {
-        this.timeInterval = timeInterval;
-    }
-
     public MazeGame getSingleUserGame() {
         return singleUserGame;
     }
@@ -38,10 +29,6 @@ public class MoveCatThread implements Runnable {
     }
 
     public void setThreadStop(boolean threadStop) {
-        this.threadStop = threadStop;
-    }
-
-    public void setMoveCatThreadStop(boolean threadStop) {
         this.threadStop = threadStop;
     }
 

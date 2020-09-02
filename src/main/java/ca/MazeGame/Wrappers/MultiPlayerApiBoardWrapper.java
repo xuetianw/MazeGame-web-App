@@ -25,7 +25,7 @@ public class MultiPlayerApiBoardWrapper {
     }
 
     private void placeSecondMouse() {
-        secondUserLocation = ApiLocationWrapper.makeFromCellLocation(game.getPcPlayer().getLocation());
+        secondUserLocation = ApiLocationWrapper.makeFromCellLocation(game.getPCCellLocation());
     }
 
     private void setWidths() {

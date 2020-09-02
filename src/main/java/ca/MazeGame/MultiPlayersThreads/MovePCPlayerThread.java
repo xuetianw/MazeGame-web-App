@@ -2,6 +2,7 @@ package ca.MazeGame.MultiPlayersThreads;
 
 import ca.MazeGame.Graph.Graph;
 import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
+import ca.MazeGame.exception.BadRequestException;
 import ca.MazeGame.model.*;
 
 import java.util.ArrayList;
@@ -18,14 +19,12 @@ public class MovePCPlayerThread implements Runnable {
         this.multiPlayerMazeGame = multiPlayerMazeGame;
     }
 
-
-
     @Override
     public void run() {
         while (!multiPlayerMazeGame.hasAnyUserWon() && !multiPlayerMazeGame.hasAnyUserLost() && !threadStop) {
 //            System.out.println(game.toString());
             try {
-                multiPlayerMazeGame.movePCPlayer();
+//                multiPlayerMazeGame.movePCPlayer();
                 doWonOrLost();
                 Thread.sleep(timeInterval);
             } catch (InterruptedException e) {
@@ -46,6 +45,32 @@ public class MovePCPlayerThread implements Runnable {
     }
     public void revealBoard() {
         multiPlayerMazeGame.displayBoard();
+    }
+
+
+    public void decreaseTimeInterval() {
+        if (timeInterval >= 200) {
+            timeInterval -= 50;
+        } else {
+            throw new BadRequestException("the limit has been reached");
+        }
+
+    }
+
+    public void increaseTimeInterval() {
+        if (timeInterval <= 1000) {
+            timeInterval += 50;
+        } else {
+            throw new BadRequestException("the limit has been reached");
+        }
+    }
+
+    public boolean isThreadStop() {
+        return threadStop;
+    }
+
+    public void setThreadStop(boolean threadStop) {
+        this.threadStop = threadStop;
     }
 
 }

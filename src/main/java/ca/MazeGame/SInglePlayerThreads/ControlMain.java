@@ -86,6 +86,6 @@ public class ControlMain extends MoveUtility {
     }
 
     public void stopThreads() {
-        moveCatTask.setMoveCatThreadStop(true);
+        moveCatTask.setThreadStop(true);
     }
 }
