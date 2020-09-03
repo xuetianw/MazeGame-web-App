@@ -2,6 +2,7 @@ package ca.MazeGame.MultiPlayersThreads;
 
 import ca.MazeGame.Graph.Graph;
 import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
+import ca.MazeGame.Observer.Observer;
 import ca.MazeGame.model.CellLocation;
 import ca.MazeGame.model.CellState;
 import ca.MazeGame.model.Maze;
@@ -11,7 +12,6 @@ import java.util.List;
 public class ComputePCLocationThread implements Runnable {
 
     private final MultiPlayerMazeGame multiPlayerMazeGame;
-    private CellLocation lastCheeseLoc = new CellLocation(-1, -1);
 
     private int timeInterval = 200;
 
@@ -25,6 +25,12 @@ public class ComputePCLocationThread implements Runnable {
     public ComputePCLocationThread(MultiPlayerMazeGame multiPlayerMazeGame) {
         this.multiPlayerMazeGame = multiPlayerMazeGame;
         addGraphEdges();
+        registerAsObserver(multiPlayerMazeGame);
+        calculateArray();
+    }
+
+    private void registerAsObserver(MultiPlayerMazeGame multiPlayerMazeGame) {
+        multiPlayerMazeGame.attach(() -> calculateArray());
     }
 
     @Override
@@ -32,12 +38,6 @@ public class ComputePCLocationThread implements Runnable {
         while (!multiPlayerMazeGame.hasAnyUserWon() && !multiPlayerMazeGame.hasAnyUserLost() && !threadStop) {
             try {
                 System.out.println("running");
-                //todo add observer instead of using if condition
-                if (!lastCheeseLoc.equals(multiPlayerMazeGame.getCheeseLocation())) {
-                    System.out.println("new cheese placed");
-                    lastCheeseLoc = multiPlayerMazeGame.getCheeseLocation();
-                    calculateArray();
-                }
                 setPCPlayerLoc();
                 doWonOrLost();
                 Thread.sleep(timeInterval);
