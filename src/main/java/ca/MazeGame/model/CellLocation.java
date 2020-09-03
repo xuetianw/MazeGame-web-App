@@ -55,4 +55,9 @@ public class CellLocation {
         CellLocation other = (CellLocation) o;
         return x == other.x && y == other.y;
     }
+
+    @Override
+    public String toString() {
+       return ("x :" + x + " y: " + y);
+    }
 }
