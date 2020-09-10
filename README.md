@@ -14,4 +14,4 @@ https://www.youtube.com/watch?v=w5q0nAAb_kU&t=2s
 ![alt text](Readme-Images/MultiplayerUI.png)
 
 # production on AWS cloud
-http://mulitiplayersmazegame-env-1.eba-jjrcgk6y.ca-central-1.elasticbeanstalk.com/
+http://mulitiplayersmazegamenew-env.eba-2eau5dej.ca-central-1.elasticbeanstalk.com/
