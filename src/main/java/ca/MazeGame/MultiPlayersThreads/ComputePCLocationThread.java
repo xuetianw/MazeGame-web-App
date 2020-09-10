@@ -8,6 +8,7 @@ import ca.MazeGame.model.CellState;
 import ca.MazeGame.model.Maze;
 
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ComputePCLocationThread implements Runnable {
 
@@ -18,6 +19,8 @@ public class ComputePCLocationThread implements Runnable {
     private Graph g;
 
     private boolean threadStop = false;
+
+    private ReentrantLock lock = new ReentrantLock();
 
     private CellLocation[] playerLocArray;
     private int pcPlayerLocArrInd = 0;
@@ -65,6 +68,7 @@ public class ComputePCLocationThread implements Runnable {
 
 
     private void addGraphEdges() {
+        lock.lock();
         g = new Graph(MultiPlayerMazeGame.getBoardHeight() * MultiPlayerMazeGame.getBoardWidth());
 
         Maze maze = multiPlayerMazeGame.getMaze();
@@ -89,6 +93,7 @@ public class ComputePCLocationThread implements Runnable {
                 }
             }
         }
+        lock.unlock();
     }
 
 
@@ -106,13 +111,17 @@ public class ComputePCLocationThread implements Runnable {
 
 
     private void setPCPlayerLoc() {
+        lock.lock();
+
         System.out.println("setPCPlayerLoc");
         if (pcPlayerLocArrInd < playerLocArray.length) {
             multiPlayerMazeGame.recordPCPlayerLoc(playerLocArray[pcPlayerLocArrInd++]);
             System.out.printf("pcPlayerLocArrInd : %d: out of %d \n", pcPlayerLocArrInd, playerLocArray.length);
         } else {
-            System.out.println("in chesse location");
+            System.out.println("in cheese location");
         }
+
+        lock.unlock();
     }
 
 
