@@ -43,7 +43,7 @@ public class MultiPlayerApiBoardWrapper {
     }
 
     private void placeMouse() {
-        this.firstUserLocation = ApiLocationWrapper.makeFromCellLocation(MazeGame.playerLocation);
+        this.firstUserLocation = ApiLocationWrapper.makeFromCellLocation(game.playerLocation);
     }
 
     private void placeCheese() {

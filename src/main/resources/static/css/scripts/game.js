@@ -16,7 +16,7 @@ const myAppObj = new Vue({
     },
 
     methods: {
-        newGame: makeNewGame,
+        newGame: makeNewSinglePlayerGame,
         cheat1Cheese: send1CheeseCheat,
         cheatShowAll: sendShowAll,
         increaseCatSpeed:  sendIncreaseCatSpeed,
@@ -59,7 +59,7 @@ $(document).ready(function() {
             loadGame();
             loadGameBoard();
         }
-    }, 200);
+    }, 1000);
 });
 
 function loadAbout() {
@@ -75,7 +75,7 @@ function loadAbout() {
         });
 }
 
-function makeNewGame() {
+function makeNewSinglePlayerGame() {
     axios.post('api/games', {})
         .then(function (response) {
             console.log("POST new game returned:", response);
@@ -144,7 +144,7 @@ function loadGameBoard() {
             .then(function (response) {
                 // console.log("Load Board returned: ", response);
                 myAppObj.board = response.data;
-                // console.log(myAppObj.game.gameNumber);
+                console.log(myAppObj.game.gameNumber);
 
                 // alertOnWrongStatus("GET board", 200, response.status);
                 // console.log("game.secondPlayerNumCheeseFound" + game.secondPlayerNumCheeseFound)

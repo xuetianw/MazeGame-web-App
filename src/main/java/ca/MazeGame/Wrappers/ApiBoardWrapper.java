@@ -37,7 +37,7 @@ public class ApiBoardWrapper {
     }
 
     private void placeMouse() {
-        this.mouseLocation = ApiLocationWrapper.makeFromCellLocation(MazeGame.playerLocation);
+        this.mouseLocation = ApiLocationWrapper.makeFromCellLocation(game.playerLocation);
     }
 
     private void placeCheese() {
@@ -69,5 +69,17 @@ public class ApiBoardWrapper {
         place_cat();
         place_wall();
         return this;
+    }
+
+
+    public static ApiBoardWrapper processMaze(MazeGame game) {
+        ApiBoardWrapper apiBoardWrapper = new ApiBoardWrapper(game);
+        apiBoardWrapper.mouseLocation = ApiLocationWrapper.makeFromCellLocation(game.playerLocation);
+        apiBoardWrapper.cheeseLocation = ApiLocationWrapper.makeFromCellLocation(game.getCheeseLocation());
+        apiBoardWrapper.setVisibilityArray();
+        apiBoardWrapper.place_wall();
+        apiBoardWrapper.place_cat();
+
+        return apiBoardWrapper;
     }
 }

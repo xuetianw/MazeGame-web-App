@@ -1,18 +1,16 @@
 package ca.MazeGame.SInglePlayerThreads;
 
 import ca.MazeGame.MazeGames.MazeGame;
-import ca.MazeGame.MultiPlayersThreads.MultiPlayersMoveCatThread;
-import ca.MazeGame.Wrappers.ApiGameWrapper;
 import ca.MazeGame.exception.BadRequestException;
 
-public class MoveCatThread implements Runnable {
+public class MoveCatTask implements Runnable {
 
     private boolean threadStop = false;
 
-    public MazeGame singleUserGame;
+    private MazeGame singleUserGame;
     private int timeInterval = 1000;
 
-    public MoveCatThread(MazeGame mazeGame) {
+    public MoveCatTask(MazeGame mazeGame) {
         this.singleUserGame = mazeGame;
     }
 

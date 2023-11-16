@@ -1,7 +1,6 @@
 package ca.MazeGame.SInglePlayerThreads;
 
 import ca.MazeGame.MazeGames.MazeGame;
-import ca.MazeGame.MultiPlayersThreads.MultiPlayersMoveCatThread;
 import ca.MazeGame.Wrappers.MoveUtility;
 import ca.MazeGame.exception.InvalidMoveException;
 import ca.MazeGame.model.Direction;
@@ -13,12 +12,13 @@ public class ControlMain extends MoveUtility {
     private MazeGame singleUserGame;
     private ReentrantLock moveLock = new ReentrantLock();
 
-    MoveCatThread moveCatTask;
+    private MoveCatTask moveCatTask;
+    private Thread moveCatThread;
 
     public ControlMain(MazeGame singleUserGame) {
         this.singleUserGame = singleUserGame;
-        moveCatTask = new MoveCatThread(singleUserGame);
-        Thread moveCatThread = new Thread(moveCatTask);
+        moveCatTask = new MoveCatTask(singleUserGame);
+        moveCatThread = new Thread(moveCatTask);
         moveCatThread.start();
     }
 
