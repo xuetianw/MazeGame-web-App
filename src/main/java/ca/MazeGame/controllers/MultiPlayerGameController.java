@@ -68,7 +68,7 @@ public class MultiPlayerGameController {
         computeLock.lock();
         for (MultiPLayerMazeGameThreadObj multiPLayerMazeGameThreadObj : mazeGameThreadsListObjs) {
             if (multiPLayerMazeGameThreadObj.gameNumber == id) {
-                MultiPlayerApiBoardWrapper copy = MultiPlayerApiBoardWrapper.processMaze(multiPLayerMazeGameThreadObj.getMultiPlayerMazeGame(), id);
+                MultiPlayerApiBoardWrapper copy = MultiPlayerApiBoardWrapper.processMaze(multiPLayerMazeGameThreadObj.getMultiPlayerMazeGame());
                 computeLock.unlock();
                 return copy;
             }

@@ -17,7 +17,7 @@ public class MultiPlayerApiBoardWrapper extends ApiBoardWrapper {
     private ApiLocationWrapper secondUserLocation;
 
     private void placeSecondMouse(MultiPlayerMazeGame game) {
-        secondUserLocation = ApiLocationWrapper.makeFromCellLocation(game.getPCCellLocation());
+        secondUserLocation = ApiLocationWrapper.makeFromCellLocation(game.getPcCellLocation());
     }
 
     private void setWidths() {
@@ -41,7 +41,7 @@ public class MultiPlayerApiBoardWrapper extends ApiBoardWrapper {
     }
 
 
-    public static MultiPlayerApiBoardWrapper processMaze(MultiPlayerMazeGame multiPlayerMazeGame, int id) {
+    public static MultiPlayerApiBoardWrapper processMaze(MultiPlayerMazeGame multiPlayerMazeGame) {
         MultiPlayerApiBoardWrapper multiPlayerApiBoardWrapper = new MultiPlayerApiBoardWrapper();
         multiPlayerApiBoardWrapper.setWidths();
 

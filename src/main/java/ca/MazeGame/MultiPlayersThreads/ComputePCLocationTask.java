@@ -5,10 +5,12 @@ import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
 import ca.MazeGame.model.CellLocation;
 import ca.MazeGame.model.CellState;
 import ca.MazeGame.model.Maze;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+@Slf4j
 public class ComputePCLocationTask implements Runnable {
 
     private final MultiPlayerMazeGame multiPlayerMazeGame;
@@ -39,7 +41,8 @@ public class ComputePCLocationTask implements Runnable {
     public void run() {
         while (!multiPlayerMazeGame.hasAnyUserWon() && !multiPlayerMazeGame.hasAnyUserLost() && !threadStop) {
             try {
-                System.out.println("running");
+                log.debug("running");
+//                System.out.println("running");
                 setPCPlayerLoc();
                 doWonOrLost();
                 Thread.sleep(timeInterval);
@@ -99,7 +102,7 @@ public class ComputePCLocationTask implements Runnable {
     private void calculateArray() {
         System.out.println("calculating array");
         pcPlayerLocArrInd = 0;
-        int secondPLayerGraphVertexIndex = convertLocToGraphVertexIndex(multiPlayerMazeGame.getPCCellLocation());
+        int secondPLayerGraphVertexIndex = convertLocToGraphVertexIndex(multiPlayerMazeGame.getPcCellLocation());
         CellLocation cheeseLoc = multiPlayerMazeGame.getCheeseLocation();
         int cheeseGraphLoc = convertLocToGraphVertexIndex(cheeseLoc);
 
@@ -112,7 +115,8 @@ public class ComputePCLocationTask implements Runnable {
     private void setPCPlayerLoc() {
         lock.lock();
 
-        System.out.println("setPCPlayerLoc");
+        log.debug("setPCPlayerLoc");
+//        System.out.println("setPCPlayerLoc");
         if (pcPlayerLocArrInd < playerLocArray.length) {
             multiPlayerMazeGame.recordPCPlayerLoc(playerLocArray[pcPlayerLocArrInd++]);
 //            System.out.printf("pcPlayerLocArrInd : %d: out of %d \n", pcPlayerLocArrInd, playerLocArray.length);
