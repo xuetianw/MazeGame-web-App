@@ -32,10 +32,10 @@ public class MultiPlayerGameController {
         MultiPlayerMazeGame mazeGame = new MultiPlayerMazeGame();
         if (mazeGameThreadsListObjs.size() != 0) {
             MultiPLayerMazeGameThreadObj multiPLayerMazeGameThreadObj =  mazeGameThreadsListObjs.get(mazeGameThreadsListObjs.size() - 1);
-            MazeGame game = multiPLayerMazeGameThreadObj.getMultiPlayerMazeGame();
-            if (!game.hasUserWon() && !game.hasUserLost()) {
-                multiPLayerMazeGameThreadObj.getMultiPlayersMainControl().stopThreads();
-            }
+//            MazeGame game = multiPLayerMazeGameThreadObj.getMultiPlayerMazeGame();
+//            if (!game.hasUserWon() && !game.hasUserLost()) {
+//                multiPLayerMazeGameThreadObj.getMultiPlayersMainControl().stopThreads();
+//            }
         }
         long id = nextId.incrementAndGet();
         MultiPLayerMazeGameThreadObj multiPLayerMazeGameThreadObj = new MultiPLayerMazeGameThreadObj(mazeGame, id);
@@ -68,7 +68,7 @@ public class MultiPlayerGameController {
         computeLock.lock();
         for (MultiPLayerMazeGameThreadObj multiPLayerMazeGameThreadObj : mazeGameThreadsListObjs) {
             if (multiPLayerMazeGameThreadObj.gameNumber == id) {
-                MultiPlayerApiBoardWrapper copy = MultiPlayerApiGameWrapper.apiBoardWrapper.processMaze();
+                MultiPlayerApiBoardWrapper copy = MultiPlayerApiBoardWrapper.processMaze(multiPLayerMazeGameThreadObj.getMultiPlayerMazeGame(), id);
                 computeLock.unlock();
                 return copy;
             }

@@ -3,15 +3,13 @@ package ca.MazeGame.MultiPlayersThreads;
 import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
 import ca.MazeGame.Wrappers.MoveUtility;
 
-import java.util.concurrent.locks.ReentrantLock;
-
-public class MultiPlayersMoveCatThread extends MoveUtility implements Runnable {
+public class MultiPlayersMoveCatTask extends MoveUtility implements Runnable {
     private final MultiPlayerMazeGame multiPlayerMazeGame;
 
     private int timeInterval = 1000;
     private boolean threadStop = false;
 
-    public MultiPlayersMoveCatThread(MultiPlayerMazeGame multiPlayerMazeGame) {
+    public MultiPlayersMoveCatTask(MultiPlayerMazeGame multiPlayerMazeGame) {
         this.multiPlayerMazeGame = multiPlayerMazeGame;
     }
 

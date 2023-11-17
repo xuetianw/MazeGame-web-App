@@ -2,7 +2,6 @@ package ca.MazeGame.MultiPlayersThreads;
 
 import ca.MazeGame.Graph.Graph;
 import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
-import ca.MazeGame.Observer.Observer;
 import ca.MazeGame.model.CellLocation;
 import ca.MazeGame.model.CellState;
 import ca.MazeGame.model.Maze;
@@ -10,7 +9,7 @@ import ca.MazeGame.model.Maze;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ComputePCLocationThread implements Runnable {
+public class ComputePCLocationTask implements Runnable {
 
     private final MultiPlayerMazeGame multiPlayerMazeGame;
 
@@ -25,7 +24,7 @@ public class ComputePCLocationThread implements Runnable {
     private CellLocation[] playerLocArray;
     private int pcPlayerLocArrInd = 0;
 
-    public ComputePCLocationThread(MultiPlayerMazeGame multiPlayerMazeGame) {
+    public ComputePCLocationTask(MultiPlayerMazeGame multiPlayerMazeGame) {
         this.multiPlayerMazeGame = multiPlayerMazeGame;
         addGraphEdges();
         registerAsObserver(multiPlayerMazeGame);
@@ -116,7 +115,7 @@ public class ComputePCLocationThread implements Runnable {
         System.out.println("setPCPlayerLoc");
         if (pcPlayerLocArrInd < playerLocArray.length) {
             multiPlayerMazeGame.recordPCPlayerLoc(playerLocArray[pcPlayerLocArrInd++]);
-            System.out.printf("pcPlayerLocArrInd : %d: out of %d \n", pcPlayerLocArrInd, playerLocArray.length);
+//            System.out.printf("pcPlayerLocArrInd : %d: out of %d \n", pcPlayerLocArrInd, playerLocArray.length);
         } else {
             System.out.println("in cheese location");
         }

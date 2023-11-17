@@ -17,7 +17,7 @@ public class MazeGame {
     protected final Maze maze = new Maze(boardWidth, boardHeight);
 
     protected CellLocation cheeseLocation;
-    public static CellLocation playerLocation;
+    public CellLocation playerLocation;
 
     private final List<Cat> cats = new ArrayList<>();
 
@@ -101,7 +101,7 @@ public class MazeGame {
     }
 
     protected void placeCatsOnBoard() {
-        cats.clear();
+//        cats.clear();
         CellLocation cat;
         do {
             cat = maze.getRandomLocationInsideMaze();

@@ -6,6 +6,7 @@ import ca.MazeGame.Wrappers.ApiBoardWrapper;
 import ca.MazeGame.Wrappers.ApiGameWrapper;
 import ca.MazeGame.exception.ResourceNotFoundException;
 import ca.MazeGame.MazeGames.MazeGame;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class GameController {
     private List<MazeGameThreadObj> mazeGameThreadObjs = new ArrayList<>();
 
@@ -35,6 +37,7 @@ public class GameController {
     @PostMapping("/games")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiGameWrapper postNewgame() throws SocketException {
+//        System.out.println("postNewgame called with gameId ");
         ReentrantLock lock = new ReentrantLock();
         lock.lock();
 
@@ -42,9 +45,9 @@ public class GameController {
         if (mazeGameThreadObjs.size() != 0) {
             MazeGameThreadObj mazeGameThreadObj =  mazeGameThreadObjs.get(mazeGameThreadObjs.size() - 1);
             MazeGame game = mazeGameThreadObj.getSingleUserGame();
-            if (!game.hasUserWon() && !game.hasUserLost()) {
-                mazeGameThreadObj.getMainControl().stopThreads();
-            }
+//            if (!game.hasUserWon() && !game.hasUserLost()) {
+//                mazeGameThreadObj.getMainControl().stopThreads();
+//            }
         }
         long id = nextId.incrementAndGet();
         MazeGameThreadObj mazeGameThreadObj = new MazeGameThreadObj(mazeGame, id);
@@ -62,6 +65,7 @@ public class GameController {
 
     @GetMapping("games/{id}")
     public ApiGameWrapper getGame(@PathVariable("id") long gameId) {
+        log.debug("getGame called with gameId " + gameId);
         computeLock.lock();
         for (MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
             if (mazeGameThreadObj.gameNumber == gameId) {
@@ -76,10 +80,12 @@ public class GameController {
 
     @GetMapping("/games/{id}/board")
     public ApiBoardWrapper getBoard(@PathVariable("id") int id) {
+        log.debug("getBoard called with id" + id);
         computeLock.lock();
         for (MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
             if (mazeGameThreadObj.gameNumber == id) {
-                ApiBoardWrapper copy = ApiGameWrapper.apiBoardWrapper.processMaze();
+//                ApiBoardWrapper copy = ApiGameWrapper.apiBoardWrapper.processMaze();
+                ApiBoardWrapper copy = ApiBoardWrapper.processMaze(mazeGameThreadObj.getSingleUserGame());
                 computeLock.unlock();
                 return copy;
             }
@@ -92,6 +98,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void makeMove(@PathVariable("id") int gameId,
                          @RequestBody String newMove) {
+        log.debug("makeMove called with gameId" + gameId);
         for(MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
             if(mazeGameThreadObj.gameNumber == gameId){
                 mazeGameThreadObj.getMainControl().move(newMove);

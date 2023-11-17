@@ -24,10 +24,8 @@ public class MultiPlayerApiGameWrapper extends MoveUtility {
     public int numCheeseGoal;
     public Long gameNumber;
 
-    public static MultiPlayerApiBoardWrapper apiBoardWrapper;
 
     public static MultiPlayerApiGameWrapper processMaze(MultiPlayerMazeGame multiPlayerMazeGame, long id) {
-        apiBoardWrapper = new MultiPlayerApiBoardWrapper(multiPlayerMazeGame);
 
         MultiPlayerApiGameWrapper multiPlayerApiGameWrapper = new MultiPlayerApiGameWrapper();
         multiPlayerApiGameWrapper.gameNumber = id;

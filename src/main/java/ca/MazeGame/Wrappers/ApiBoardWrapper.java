@@ -10,24 +10,22 @@ import java.util.List;
 public class ApiBoardWrapper {
     public int boardWidth;
     public int boardHeight;
-    public ApiLocationWrapper mouseLocation;
+    public ApiLocationWrapper firstUserLocation;
     public ApiLocationWrapper cheeseLocation;
     public List<ApiLocationWrapper> catLocations;
     public boolean[][] hasWalls;
     public boolean[][] isVisible;
-    private MazeGame game;
 
-    public ApiBoardWrapper(MazeGame game) {
-        setWidths();
-        this.game = game;
+    public ApiBoardWrapper() {
     }
+
 
     private void setWidths() {
         boardHeight = MazeGame.getBoardHeight();
         boardWidth = MazeGame.getBoardWidth();
     }
 
-    private void setVisibilityArray() {
+    protected void setVisibilityArray() {
         isVisible = new boolean[boardWidth][boardHeight];
         for (int i = 0; i < boardWidth; i++) {
             for (int j = 0; j < boardHeight; j++) {
@@ -36,15 +34,8 @@ public class ApiBoardWrapper {
         }
     }
 
-    private void placeMouse() {
-        this.mouseLocation = ApiLocationWrapper.makeFromCellLocation(MazeGame.playerLocation);
-    }
 
-    private void placeCheese() {
-        this.cheeseLocation = ApiLocationWrapper.makeFromCellLocation(game.getCheeseLocation());
-    }
-
-    private void place_cat() {
+    private void place_cat(MazeGame game) {
         List<CellLocation> locations = new ArrayList<>();
         for (Cat cat : game.getCats()) {
             locations.add(cat.getLocation());
@@ -52,7 +43,7 @@ public class ApiBoardWrapper {
         catLocations = ApiLocationWrapper.makeFromCellLocations(locations);
     }
 
-    private void place_wall() {
+    protected void place_wall(MazeGame game) {
         hasWalls = new boolean[boardWidth][boardHeight];
         for (int i = 0; i < boardHeight; i++) {
             for (int j = 0; j < boardWidth; j++) {
@@ -62,12 +53,16 @@ public class ApiBoardWrapper {
         }
     }
 
-    public ApiBoardWrapper processMaze() {
-        placeMouse();
-        placeCheese();
-        setVisibilityArray();
-        place_cat();
-        place_wall();
-        return this;
+
+    public static ApiBoardWrapper processMaze(MazeGame game) {
+        ApiBoardWrapper apiBoardWrapper = new ApiBoardWrapper();
+        apiBoardWrapper.setWidths();
+        apiBoardWrapper.firstUserLocation = ApiLocationWrapper.makeFromCellLocation(game.playerLocation);
+        apiBoardWrapper.cheeseLocation = ApiLocationWrapper.makeFromCellLocation(game.getCheeseLocation());
+        apiBoardWrapper.setVisibilityArray();
+        apiBoardWrapper.place_wall(game);
+        apiBoardWrapper.place_cat(game);
+
+        return apiBoardWrapper;
     }
 }
