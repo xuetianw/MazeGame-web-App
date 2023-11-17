@@ -15,12 +15,10 @@ public class ApiBoardWrapper {
     public List<ApiLocationWrapper> catLocations;
     public boolean[][] hasWalls;
     public boolean[][] isVisible;
-    private MazeGame game;
 
-    public ApiBoardWrapper(MazeGame game) {
-        setWidths();
-        this.game = game;
+    public ApiBoardWrapper() {
     }
+
 
     private void setWidths() {
         boardHeight = MazeGame.getBoardHeight();
@@ -36,15 +34,8 @@ public class ApiBoardWrapper {
         }
     }
 
-    private void placeMouse() {
-        this.mouseLocation = ApiLocationWrapper.makeFromCellLocation(game.playerLocation);
-    }
 
-    private void placeCheese() {
-        this.cheeseLocation = ApiLocationWrapper.makeFromCellLocation(game.getCheeseLocation());
-    }
-
-    private void place_cat() {
+    private void place_cat(MazeGame game) {
         List<CellLocation> locations = new ArrayList<>();
         for (Cat cat : game.getCats()) {
             locations.add(cat.getLocation());
@@ -52,7 +43,7 @@ public class ApiBoardWrapper {
         catLocations = ApiLocationWrapper.makeFromCellLocations(locations);
     }
 
-    private void place_wall() {
+    private void place_wall(MazeGame game) {
         hasWalls = new boolean[boardWidth][boardHeight];
         for (int i = 0; i < boardHeight; i++) {
             for (int j = 0; j < boardWidth; j++) {
@@ -62,23 +53,15 @@ public class ApiBoardWrapper {
         }
     }
 
-    public ApiBoardWrapper processMaze() {
-        placeMouse();
-        placeCheese();
-        setVisibilityArray();
-        place_cat();
-        place_wall();
-        return this;
-    }
-
 
     public static ApiBoardWrapper processMaze(MazeGame game) {
-        ApiBoardWrapper apiBoardWrapper = new ApiBoardWrapper(game);
+        ApiBoardWrapper apiBoardWrapper = new ApiBoardWrapper();
+        apiBoardWrapper.setWidths();
         apiBoardWrapper.mouseLocation = ApiLocationWrapper.makeFromCellLocation(game.playerLocation);
         apiBoardWrapper.cheeseLocation = ApiLocationWrapper.makeFromCellLocation(game.getCheeseLocation());
         apiBoardWrapper.setVisibilityArray();
-        apiBoardWrapper.place_wall();
-        apiBoardWrapper.place_cat();
+        apiBoardWrapper.place_wall(game);
+        apiBoardWrapper.place_cat(game);
 
         return apiBoardWrapper;
     }

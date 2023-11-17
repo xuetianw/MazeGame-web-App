@@ -14,10 +14,8 @@ public class ApiGameWrapper extends MoveUtility {
     public int numCheeseGoal;
     public Long gameNumber;
 
-    public static ApiBoardWrapper apiBoardWrapper;
 
     public static ApiGameWrapper processMaze(MazeGame singleUserGame, long id) {
-        apiBoardWrapper = new ApiBoardWrapper(singleUserGame);
 
         ApiGameWrapper apiGameWrapper = new ApiGameWrapper();
         apiGameWrapper.gameNumber = id;
