@@ -2,6 +2,8 @@ package ca.MazeGame.SInglePlayerThreads;
 
 import ca.MazeGame.MazeGames.MazeGame;
 import ca.MazeGame.exception.BadRequestException;
+import lombok.extern.slf4j.Slf4j;
+
 
 public class MoveCatTask implements Runnable {
 

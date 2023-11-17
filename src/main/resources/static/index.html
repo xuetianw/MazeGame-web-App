@@ -99,7 +99,7 @@
                                 <img v-if="locationMatches(board.cheeseLocation, colIdx, rowIdx)"
                                      src="res/cookie.png" class="stack"/>
 
-                                <div v-if="locationMatches(board.mouseLocation, colIdx, rowIdx)">
+                                <div v-if="locationMatches(board.firstUserLocation, colIdx, rowIdx)">
                                     <!-- Player image depends on if won/lost/playing -->
                                     <img v-if="game.isGameWon" src="res/smile.png" class="stack"/>
                                     <img v-else-if="game.isGameLost" src="res/cancel.png" class="stack"/>

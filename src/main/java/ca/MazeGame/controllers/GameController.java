@@ -6,6 +6,7 @@ import ca.MazeGame.Wrappers.ApiBoardWrapper;
 import ca.MazeGame.Wrappers.ApiGameWrapper;
 import ca.MazeGame.exception.ResourceNotFoundException;
 import ca.MazeGame.MazeGames.MazeGame;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @RestController
 @RequestMapping("/api")
+@Slf4j
 public class GameController {
     private List<MazeGameThreadObj> mazeGameThreadObjs = new ArrayList<>();
 
@@ -63,7 +65,7 @@ public class GameController {
 
     @GetMapping("games/{id}")
     public ApiGameWrapper getGame(@PathVariable("id") long gameId) {
-        System.out.println("getGame called with gameId " + gameId);
+        log.debug("getGame called with gameId " + gameId);
         computeLock.lock();
         for (MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
             if (mazeGameThreadObj.gameNumber == gameId) {
@@ -78,7 +80,7 @@ public class GameController {
 
     @GetMapping("/games/{id}/board")
     public ApiBoardWrapper getBoard(@PathVariable("id") int id) {
-        System.out.println("getBoard called with id" + id);
+        log.debug("getBoard called with id" + id);
         computeLock.lock();
         for (MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
             if (mazeGameThreadObj.gameNumber == id) {
@@ -96,7 +98,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void makeMove(@PathVariable("id") int gameId,
                          @RequestBody String newMove) {
-        System.out.println("makeMove called with gameId" + gameId);
+        log.debug("makeMove called with gameId" + gameId);
         for(MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
             if(mazeGameThreadObj.gameNumber == gameId){
                 mazeGameThreadObj.getMainControl().move(newMove);

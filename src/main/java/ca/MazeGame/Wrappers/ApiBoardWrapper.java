@@ -10,7 +10,7 @@ import java.util.List;
 public class ApiBoardWrapper {
     public int boardWidth;
     public int boardHeight;
-    public ApiLocationWrapper mouseLocation;
+    public ApiLocationWrapper firstUserLocation;
     public ApiLocationWrapper cheeseLocation;
     public List<ApiLocationWrapper> catLocations;
     public boolean[][] hasWalls;
@@ -25,7 +25,7 @@ public class ApiBoardWrapper {
         boardWidth = MazeGame.getBoardWidth();
     }
 
-    private void setVisibilityArray() {
+    protected void setVisibilityArray() {
         isVisible = new boolean[boardWidth][boardHeight];
         for (int i = 0; i < boardWidth; i++) {
             for (int j = 0; j < boardHeight; j++) {
@@ -43,7 +43,7 @@ public class ApiBoardWrapper {
         catLocations = ApiLocationWrapper.makeFromCellLocations(locations);
     }
 
-    private void place_wall(MazeGame game) {
+    protected void place_wall(MazeGame game) {
         hasWalls = new boolean[boardWidth][boardHeight];
         for (int i = 0; i < boardHeight; i++) {
             for (int j = 0; j < boardWidth; j++) {
@@ -57,7 +57,7 @@ public class ApiBoardWrapper {
     public static ApiBoardWrapper processMaze(MazeGame game) {
         ApiBoardWrapper apiBoardWrapper = new ApiBoardWrapper();
         apiBoardWrapper.setWidths();
-        apiBoardWrapper.mouseLocation = ApiLocationWrapper.makeFromCellLocation(game.playerLocation);
+        apiBoardWrapper.firstUserLocation = ApiLocationWrapper.makeFromCellLocation(game.playerLocation);
         apiBoardWrapper.cheeseLocation = ApiLocationWrapper.makeFromCellLocation(game.getCheeseLocation());
         apiBoardWrapper.setVisibilityArray();
         apiBoardWrapper.place_wall(game);

@@ -8,20 +8,9 @@ import ca.MazeGame.model.CellLocation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultiPlayerApiBoardWrapper {
-    public int boardWidth;
-    public int boardHeight;
-    public ApiLocationWrapper firstUserLocation;
-    public ApiLocationWrapper secondUserLocation;
-    public ApiLocationWrapper cheeseLocation;
-    public List<ApiLocationWrapper> catLocations;
-    public boolean[][] hasWalls;
-    public boolean[][] isVisible;
+public class MultiPlayerApiBoardWrapper extends ApiBoardWrapper {
 
-//    public MultiPlayerApiBoardWrapper(MultiPlayerMazeGame game) {
-//        setWidths();
-//        this.game = game;
-//    }
+    public ApiLocationWrapper secondUserLocation;
 
     private void placeSecondMouse(MultiPlayerMazeGame game) {
         secondUserLocation = ApiLocationWrapper.makeFromCellLocation(game.getPCCellLocation());
@@ -32,14 +21,6 @@ public class MultiPlayerApiBoardWrapper {
         boardWidth = MazeGame.getBoardWidth();
     }
 
-    private void setVisibilityArray() {
-        isVisible = new boolean[boardWidth][boardHeight];
-        for (int i = 0; i < boardWidth; i++) {
-            for (int j = 0; j < boardHeight; j++) {
-                isVisible[i][j] = true;
-            }
-        }
-    }
 
     private void placeMouse(MultiPlayerMazeGame game) {
         this.firstUserLocation = ApiLocationWrapper.makeFromCellLocation(game.playerLocation);
@@ -57,25 +38,6 @@ public class MultiPlayerApiBoardWrapper {
         catLocations = ApiLocationWrapper.makeFromCellLocations(locations);
     }
 
-    private void place_wall(MultiPlayerMazeGame game) {
-        hasWalls = new boolean[boardWidth][boardHeight];
-        for (int i = 0; i < boardHeight; i++) {
-            for (int j = 0; j < boardWidth; j++) {
-                hasWalls[i][j] = game.getMaze().getBoard()[i][j].isWall();
-                isVisible[i][j] = game.getMaze().getBoard()[i][j].isVisible();
-            }
-        }
-    }
-
-//    public MultiPlayerApiBoardWrapper processMaze() {
-//        placeMouse();
-//        placeCheese();
-//        setVisibilityArray();
-//        place_cat();
-//        place_wall();
-//        placeSecondMouse();
-//        return this;
-//    }
 
     public static MultiPlayerApiBoardWrapper processMaze(MultiPlayerMazeGame multiPlayerMazeGame, int id) {
         MultiPlayerApiBoardWrapper multiPlayerApiBoardWrapper = new MultiPlayerApiBoardWrapper();
