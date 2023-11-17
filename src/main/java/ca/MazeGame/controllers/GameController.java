@@ -101,7 +101,7 @@ public class GameController {
         log.debug("makeMove called with gameId" + gameId);
         for(MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
             if(mazeGameThreadObj.gameNumber == gameId){
-                mazeGameThreadObj.getMainControl().move(newMove);
+                mazeGameThreadObj.getControlMain().move(newMove);
                 return;
             }
         }
@@ -113,7 +113,7 @@ public class GameController {
     public void increaseCatSpeed(@PathVariable("id") int id) {
         for(MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
             if(mazeGameThreadObj.gameNumber== id){
-                mazeGameThreadObj.getMainControl().decreaseTimeInterval();
+                mazeGameThreadObj.getControlMain().decreaseTimeInterval();
                 return;
             }
         }
@@ -124,7 +124,7 @@ public class GameController {
     public void decreaseCatSpeed(@PathVariable("id") int id) {
         for(MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
             if(mazeGameThreadObj.gameNumber== id){
-                mazeGameThreadObj.getMainControl().increaseTimeInterval();
+                mazeGameThreadObj.getControlMain().increaseTimeInterval();
                 return;
             }
         }
@@ -137,7 +137,7 @@ public class GameController {
         for(MazeGameThreadObj mazeGameThreadObj : mazeGameThreadObjs) {
             if(mazeGameThreadObj.gameNumber== id){
                 if (newMove.equals("SHOW_ALL")) {
-                    mazeGameThreadObj.getMainControl().revealBoard();
+                    mazeGameThreadObj.getControlMain().revealBoard();
                 }
                 return;
             }

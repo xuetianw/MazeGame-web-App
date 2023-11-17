@@ -84,7 +84,7 @@ public class MultiPlayerGameController {
                                     @RequestBody String newMove) {
         for(MultiPLayerMazeGameThreadObj multiPLayerMazeGameThreadObj : mazeGameThreadsListObjs) {
             if(multiPLayerMazeGameThreadObj.gameNumber== gameId){
-                multiPLayerMazeGameThreadObj.getMultiPlayersMainControl().move(newMove);
+                multiPLayerMazeGameThreadObj.getMultiPlayersControlMain().move(newMove);
                 return;
             }
         }

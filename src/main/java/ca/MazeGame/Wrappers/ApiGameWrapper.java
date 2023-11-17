@@ -6,7 +6,7 @@ import ca.MazeGame.MazeGames.MazeGame;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ApiGameWrapper extends MoveUtility {
+public class ApiGameWrapper {
 
     public boolean isGameWon;
     public boolean isGameLost;

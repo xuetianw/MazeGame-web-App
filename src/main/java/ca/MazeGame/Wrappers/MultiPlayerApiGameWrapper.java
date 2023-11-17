@@ -8,7 +8,7 @@ import ca.MazeGame.model.Direction;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-public class MultiPlayerApiGameWrapper extends MoveUtility {
+public class MultiPlayerApiGameWrapper {
     public boolean isFirstPlayerWon;
     public boolean isSecondPlayerWon;
 

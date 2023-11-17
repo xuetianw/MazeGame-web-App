@@ -4,13 +4,17 @@ import ca.MazeGame.MazeGames.MazeGame;
 import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
 import ca.MazeGame.model.Cat;
 import ca.MazeGame.model.CellLocation;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class MultiPlayerApiBoardWrapper extends ApiBoardWrapper {
 
-    public ApiLocationWrapper secondUserLocation;
+    private ApiLocationWrapper secondUserLocation;
 
     private void placeSecondMouse(MultiPlayerMazeGame game) {
         secondUserLocation = ApiLocationWrapper.makeFromCellLocation(game.getPCCellLocation());
@@ -32,9 +36,7 @@ public class MultiPlayerApiBoardWrapper extends ApiBoardWrapper {
 
     private void place_cat(MultiPlayerMazeGame game) {
         List<CellLocation> locations = new ArrayList<>();
-        for (Cat cat : game.getCats()) {
-            locations.add(cat.getLocation());
-        }
+        game.getCats().forEach(cat -> locations.add(cat.getLocation()));
         catLocations = ApiLocationWrapper.makeFromCellLocations(locations);
     }
 
