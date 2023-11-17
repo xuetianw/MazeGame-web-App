@@ -17,14 +17,13 @@ public class MultiPlayerApiBoardWrapper {
     public List<ApiLocationWrapper> catLocations;
     public boolean[][] hasWalls;
     public boolean[][] isVisible;
-    public MultiPlayerMazeGame game;
 
-    public MultiPlayerApiBoardWrapper(MultiPlayerMazeGame game) {
-        setWidths();
-        this.game = game;
-    }
+//    public MultiPlayerApiBoardWrapper(MultiPlayerMazeGame game) {
+//        setWidths();
+//        this.game = game;
+//    }
 
-    private void placeSecondMouse() {
+    private void placeSecondMouse(MultiPlayerMazeGame game) {
         secondUserLocation = ApiLocationWrapper.makeFromCellLocation(game.getPCCellLocation());
     }
 
@@ -42,15 +41,15 @@ public class MultiPlayerApiBoardWrapper {
         }
     }
 
-    private void placeMouse() {
+    private void placeMouse(MultiPlayerMazeGame game) {
         this.firstUserLocation = ApiLocationWrapper.makeFromCellLocation(game.playerLocation);
     }
 
-    private void placeCheese() {
+    private void placeCheese(MultiPlayerMazeGame game) {
         this.cheeseLocation = ApiLocationWrapper.makeFromCellLocation(game.getCheeseLocation());
     }
 
-    private void place_cat() {
+    private void place_cat(MultiPlayerMazeGame game) {
         List<CellLocation> locations = new ArrayList<>();
         for (Cat cat : game.getCats()) {
             locations.add(cat.getLocation());
@@ -58,7 +57,7 @@ public class MultiPlayerApiBoardWrapper {
         catLocations = ApiLocationWrapper.makeFromCellLocations(locations);
     }
 
-    private void place_wall() {
+    private void place_wall(MultiPlayerMazeGame game) {
         hasWalls = new boolean[boardWidth][boardHeight];
         for (int i = 0; i < boardHeight; i++) {
             for (int j = 0; j < boardWidth; j++) {
@@ -68,13 +67,27 @@ public class MultiPlayerApiBoardWrapper {
         }
     }
 
-    public MultiPlayerApiBoardWrapper processMaze() {
-        placeMouse();
-        placeCheese();
-        setVisibilityArray();
-        place_cat();
-        place_wall();
-        placeSecondMouse();
-        return this;
+//    public MultiPlayerApiBoardWrapper processMaze() {
+//        placeMouse();
+//        placeCheese();
+//        setVisibilityArray();
+//        place_cat();
+//        place_wall();
+//        placeSecondMouse();
+//        return this;
+//    }
+
+    public static MultiPlayerApiBoardWrapper processMaze(MultiPlayerMazeGame multiPlayerMazeGame, int id) {
+        MultiPlayerApiBoardWrapper multiPlayerApiBoardWrapper = new MultiPlayerApiBoardWrapper();
+        multiPlayerApiBoardWrapper.setWidths();
+
+        multiPlayerApiBoardWrapper.placeMouse(multiPlayerMazeGame);
+        multiPlayerApiBoardWrapper.placeCheese(multiPlayerMazeGame);
+        multiPlayerApiBoardWrapper.setVisibilityArray();
+        multiPlayerApiBoardWrapper.place_cat(multiPlayerMazeGame);
+        multiPlayerApiBoardWrapper.place_wall(multiPlayerMazeGame);
+        multiPlayerApiBoardWrapper.placeSecondMouse(multiPlayerMazeGame);
+
+        return multiPlayerApiBoardWrapper;
     }
 }
