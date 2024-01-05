@@ -3,21 +3,22 @@ package ca.MazeGame.Wrappers;
 import ca.MazeGame.model.Cat;
 import ca.MazeGame.model.CellLocation;
 import ca.MazeGame.MazeGames.MazeGame;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 public class ApiBoardWrapper {
-    public int boardWidth;
-    public int boardHeight;
-    public ApiLocationWrapper firstUserLocation;
-    public ApiLocationWrapper cheeseLocation;
-    public List<ApiLocationWrapper> catLocations;
-    public boolean[][] hasWalls;
-    public boolean[][] isVisible;
-
-    public ApiBoardWrapper() {
-    }
+    protected int boardWidth;
+    protected int boardHeight;
+    protected ApiLocationWrapper firstUserLocation;
+    protected ApiLocationWrapper cheeseLocation;
+    protected List<ApiLocationWrapper> catLocations;
+    protected boolean[][] hasWalls;
+    protected boolean[][] isVisible;
 
 
     private void setWidths() {

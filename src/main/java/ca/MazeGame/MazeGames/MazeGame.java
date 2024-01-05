@@ -4,15 +4,21 @@ import ca.MazeGame.model.Cat;
 import ca.MazeGame.model.CellLocation;
 import ca.MazeGame.model.Direction;
 import ca.MazeGame.model.Maze;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@Builder
+@AllArgsConstructor
 public class MazeGame {
     public static final int NUM_CHEESE_TO_COLLECT = 1;
     protected int numCheeseCollected;
 
+    @Getter
     protected static int boardWidth = 15;
+    @Getter
     protected static int boardHeight = 15;
     protected final Maze maze = new Maze(boardWidth, boardHeight);
 
@@ -22,52 +28,9 @@ public class MazeGame {
     private final List<Cat> cats = new ArrayList<>();
 
 
-    public CellLocation getCheeseLocation() {
-        return cheeseLocation;
-    }
-
-    public void setCheeseLocation(CellLocation cheeseLocation) {
-        this.cheeseLocation = cheeseLocation;
-    }
-
-    public int getNumCheeseCollected() {
-        return numCheeseCollected;
-    }
-
-    public void setNumCheeseCollected(int numCheeseCollected) {
-        this.numCheeseCollected = numCheeseCollected;
-    }
-
-
     public static int getNumCheeseToCollect() {
         return NUM_CHEESE_TO_COLLECT;
     }
-
-    public static void setBoardWidth(int boardWidth) {
-        MazeGame.boardWidth = boardWidth;
-    }
-
-    public static void setBoardHeight(int boardHeight) {
-        MazeGame.boardHeight = boardHeight;
-    }
-
-    public static int getBoardWidth() {
-        return boardWidth;
-    }
-
-    public static int getBoardHeight() {
-        return boardHeight;
-    }
-
-
-    public List<Cat> getCats() {
-        return cats;
-    }
-
-    public Maze getMaze() {
-        return maze;
-    }
-
 
     public MazeGame() {
         placePlayer();
@@ -125,6 +88,7 @@ public class MazeGame {
         for (Cat cat : cats) {
             cat.doMove();
         }
+        cats.forEach(Cat::doMove);
     }
 
     public void recordPlayerMove(Direction move) {
@@ -173,8 +137,8 @@ public class MazeGame {
     }
 
     public void displayBoard() {
-        for (int y = 0; y < MazeGame.getBoardHeight(); y++) {
-            for (int x = 0; x < MazeGame.getBoardWidth(); x++) {
+        for (int y = 0; y < MazeGame.boardHeight; y++) {
+            for (int x = 0; x < MazeGame.boardWidth; x++) {
                 CellLocation cell = new CellLocation(x, y);
                 maze.recordCellVisible(cell);
             }

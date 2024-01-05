@@ -2,7 +2,7 @@
 const singlePlayerMode = "single";
 const doublePlayerMode = "multiple";
 
-// Handle back-end server interactions fro game UI.
+// Handle back-end server interactions from game UI.
 const myAppObj = new Vue({
     el: "#gameApp",
     data: {

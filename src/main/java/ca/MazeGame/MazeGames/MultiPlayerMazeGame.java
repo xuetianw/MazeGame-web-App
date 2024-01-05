@@ -2,10 +2,18 @@ package ca.MazeGame.MazeGames;
 
 import ca.MazeGame.Observer.Observer;
 import ca.MazeGame.model.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
+@EqualsAndHashCode(callSuper = true)
+@Data
+@AllArgsConstructor
 public class MultiPlayerMazeGame extends MazeGame {
 
     private List<Observer> observers = new ArrayList<>();
@@ -16,13 +24,6 @@ public class MultiPlayerMazeGame extends MazeGame {
 
     private CellLocation pcCellLocation;
 
-    public CellLocation getPCCellLocation() {
-        return pcCellLocation;
-    }
-
-    public void setPCPlayer(CellLocation pcPlayer) {
-        this.pcCellLocation = pcPlayer;
-    }
 
     public MultiPlayerMazeGame() {
         super();
@@ -90,10 +91,6 @@ public class MultiPlayerMazeGame extends MazeGame {
     }
 
 
-    public int getSecondPlayerCheeseCollected() {
-        return secondPlayerCheeseCollected;
-    }
-
     public void setSecondPlayerCheeseCollected(int secondPlayerCheeseCollected) {
         this.secondPlayerCheeseCollected = secondPlayerCheeseCollected;
     }
@@ -103,13 +100,6 @@ public class MultiPlayerMazeGame extends MazeGame {
     }
 
 
-    public CellLocation getCheeseLocation() {
-        return cheeseLocation;
-    }
-
-    public void setCheeseLocation(CellLocation cheeseLocation) {
-        this.cheeseLocation = cheeseLocation;
-    }
 
     @Override
     public boolean hasUserWon() {
@@ -122,9 +112,10 @@ public class MultiPlayerMazeGame extends MazeGame {
     }
 
     public void notifyAllObservers(){
-        for (Observer observer : observers) {
-            observer.update();
-            System.out.println("notify observer");
-        }
+//        for (Observer observer : observers) {
+//            observer.update();
+//            System.out.println("notify observer");
+//        }
+        observers.forEach(Observer::update);
     }
 }

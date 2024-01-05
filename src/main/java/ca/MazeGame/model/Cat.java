@@ -1,7 +1,10 @@
 package ca.MazeGame.model;
 
 import ca.MazeGame.MazeGames.MazeGame;
-import ca.MazeGame.MazeGames.MultiPlayerMazeGame;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +13,10 @@ import java.util.List;
 /**
  * The position and motion control of a cat.
  */
+
+@Data
+@AllArgsConstructor
+@Builder
 public class Cat {
 	private final MazeGame game;
 	private CellLocation location;
@@ -18,10 +25,6 @@ public class Cat {
 	public Cat(MazeGame game, CellLocation location) {
 		this.game = game;
 		this.location = location;
-	}
-	
-	public CellLocation getLocation() {
-		return location;
 	}
 
 	public void doMove() {
