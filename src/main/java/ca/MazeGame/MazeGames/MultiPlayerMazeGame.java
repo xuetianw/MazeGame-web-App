@@ -112,9 +112,10 @@ public class MultiPlayerMazeGame extends MazeGame {
     }
 
     public void notifyAllObservers(){
-        for (Observer observer : observers) {
-            observer.update();
-            System.out.println("notify observer");
-        }
+//        for (Observer observer : observers) {
+//            observer.update();
+//            System.out.println("notify observer");
+//        }
+        observers.forEach(Observer::update);
     }
 }

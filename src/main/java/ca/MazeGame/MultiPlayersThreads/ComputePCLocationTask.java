@@ -34,7 +34,7 @@ public class ComputePCLocationTask implements Runnable {
     }
 
     private void registerAsObserver(MultiPlayerMazeGame multiPlayerMazeGame) {
-        multiPlayerMazeGame.attach(() -> calculateArray());
+        multiPlayerMazeGame.attach(this::calculateArray);
     }
 
     @Override
