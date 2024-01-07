@@ -54,12 +54,6 @@ window.addEventListener('keydown', function(e) {
 // Refresh UI at start
 $(document).ready(function() {
     loadAbout();
-    window.setInterval(function () {
-        if ((myAppObj.game != null) || (myAppObj.multiplayerGame != null)) {
-            loadGame();
-            loadGameBoard();
-        }
-    }, 1000);
 });
 
 function loadAbout() {
@@ -75,7 +69,25 @@ function loadAbout() {
         });
 }
 
+function loadGamesAndBoard() {
+    var intervalId = window.setInterval(function () {
+        if ((myAppObj.game != null) || (myAppObj.multiplayerGame != null)) {
+            loadGame();
+            loadGameBoard();
+        }
+
+        if (myAppObj.game.isGameLost || myAppObj.game.isGameWon) {
+            console.log("game over, stop loading game an board")
+            window.clearInterval(intervalId);
+        }
+        // myAppObj.multiplayerGame
+    }, 1000);
+}
+
 function makeNewSinglePlayerGame() {
+
+    loadGamesAndBoard();
+
     axios.post('api/games', {})
         .then(function (response) {
             console.log("POST new game returned:", response);
@@ -91,6 +103,9 @@ function makeNewSinglePlayerGame() {
 }
 
 function makeMultiPlayer() {
+
+    loadGamesAndBoard();
+
     axios.post('api/multiPlayerGames', {})
         .then(function (response) {
             console.log("POST new MultiPlayergame returned:", response);
@@ -189,6 +204,7 @@ function send1CheeseCheat() {
         });
 }
 function sendShowAll() {
+    console.log("sendShowAll called")
     axios.post('/api/games/' + myAppObj.game.gameNumber + "/cheatstate", "SHOW_ALL", plainTextConfig)
         .then(function (response) {
             console.log("Cheat returned: ", response);

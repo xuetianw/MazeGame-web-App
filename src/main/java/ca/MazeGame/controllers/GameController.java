@@ -42,13 +42,13 @@ public class GameController {
         lock.lock();
 
         MazeGame mazeGame = new MazeGame();
-        if (mazeGameThreadObjs.size() != 0) {
-            MazeGameThreadObj mazeGameThreadObj =  mazeGameThreadObjs.get(mazeGameThreadObjs.size() - 1);
-            MazeGame game = mazeGameThreadObj.getSingleUserGame();
+//        if (mazeGameThreadObjs.size() != 0) {
+//            MazeGameThreadObj mazeGameThreadObj =  mazeGameThreadObjs.get(mazeGameThreadObjs.size() - 1);
+//            MazeGame game = mazeGameThreadObj.getSingleUserGame();
 //            if (!game.hasUserWon() && !game.hasUserLost()) {
 //                mazeGameThreadObj.getMainControl().stopThreads();
 //            }
-        }
+//        }
         long id = nextId.incrementAndGet();
         MazeGameThreadObj mazeGameThreadObj = new MazeGameThreadObj(mazeGame, id);
         mazeGameThreadObjs.add(mazeGameThreadObj);
