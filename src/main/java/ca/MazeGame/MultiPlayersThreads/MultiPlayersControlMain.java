@@ -34,15 +34,15 @@ public class MultiPlayersControlMain extends MoveUtility {
     }
 
     public void move(String newMove) {
-        if (newMove.equals("MOVE_CATS")) {
-            moveLock.lock();
-
-            multiPlayerMazeGame.moveCat();
-            doWonOrLost();
-
-            moveLock.unlock();
-            return;
-        }
+//        if (newMove.equals("MOVE_CATS")) {
+//            moveLock.lock();
+//
+//            multiPlayerMazeGame.moveCat();
+//            doWonOrLost();
+//
+//            moveLock.unlock();
+//            return;
+//        }
 
         moveLock.lock();
 

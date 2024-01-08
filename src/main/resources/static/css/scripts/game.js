@@ -51,15 +51,11 @@ window.addEventListener('keydown', function(e) {
     }
 });
 
+var intervalId
+
 // Refresh UI at start
 $(document).ready(function() {
     loadAbout();
-    window.setInterval(function () {
-        if ((myAppObj.game != null) || (myAppObj.multiplayerGame != null)) {
-            loadGame();
-            loadGameBoard();
-        }
-    }, 1000);
 });
 
 function loadAbout() {
@@ -75,7 +71,11 @@ function loadAbout() {
         });
 }
 
+
 function makeNewSinglePlayerGame() {
+
+    loadGamesAndBoard()
+
     axios.post('api/games', {})
         .then(function (response) {
             console.log("POST new game returned:", response);
@@ -90,7 +90,44 @@ function makeNewSinglePlayerGame() {
         });
 }
 
+function loadGamesAndBoard() {
+    console.log("intervalId: " + intervalId)
+
+    window.clearInterval(intervalId);
+    console.log("clear intervalId: " + intervalId)
+
+    intervalId = window.setInterval(function () {
+        if ((myAppObj.game != null) || (myAppObj.multiplayerGame != null)) {
+            loadGame();
+            loadGameBoard();
+        }
+
+        if (myAppObj.gameMode === singlePlayerMode) {
+            if (myAppObj.game.isGameLost || myAppObj.game.isGameWon) {
+                console.log("game over, stop loading game and board")
+                window.clearInterval(intervalId);
+                console.log("clear intervalId: " + intervalId)
+            }
+        }
+
+
+        if (myAppObj.gameMode === doublePlayerMode) {
+            if (myAppObj.multiplayerGame.isGameLost || myAppObj.multiplayerGame.isGameWon) {
+                console.log("game over, stop loading game and board")
+                window.clearInterval(intervalId);
+                console.log("clear intervalId: " + intervalId)
+            }
+        }
+
+
+        // myAppObj.multiplayerGame
+    }, 1000);
+}
+
 function makeMultiPlayer() {
+
+    loadGamesAndBoard();
+
     axios.post('api/multiPlayerGames', {})
         .then(function (response) {
             console.log("POST new MultiPlayergame returned:", response);
@@ -104,37 +141,39 @@ function makeMultiPlayer() {
 }
 
 
+function loadSinglePlayerGame() {
+    axios.get('/api/games/' + myAppObj.game.gameNumber, {})
+        .then(function (response) {
+            // console.log("Load game returned:", response);
+            myAppObj.game = response.data;
+            myAppObj.multiplayerGame = null;
+
+            // alertOnWrongStatus("GET Game", 200, response.status);
+        })
+        .catch(function (error) {
+            console.log("Load game ERROR: ", error);
+        });
+}
+
+function loadMultiPlayerGame() {
+    axios.get('/api/multiPlayerGames/' + myAppObj.multiplayerGame.gameNumber, {})
+        .then(function (response) {
+            // console.log("Load game returned:", response);
+            myAppObj.multiplayerGame = response.data;
+
+
+            // alertOnWrongStatus("GET Game", 200, response.status);
+        })
+        .catch(function (error) {
+            console.log("Load game ERROR: ", error);
+        });
+}
+
 function loadGame() {
-    function loadSinglePlayer() {
-        axios.get('/api/games/' + myAppObj.game.gameNumber, {})
-            .then(function (response) {
-                // console.log("Load game returned:", response);
-                myAppObj.game = response.data;
-                myAppObj.multiplayerGame = null;
 
-                // alertOnWrongStatus("GET Game", 200, response.status);
-            })
-            .catch(function (error) {
-                console.log("Load game ERROR: ", error);
-            });
-    }
-
-    function loadMultiPlayerGame() {
-        axios.get('/api/multiPlayerGames/' + myAppObj.multiplayerGame.gameNumber, {})
-            .then(function (response) {
-                // console.log("Load game returned:", response);
-                myAppObj.multiplayerGame = response.data;
-
-
-                // alertOnWrongStatus("GET Game", 200, response.status);
-            })
-            .catch(function (error) {
-                console.log("Load game ERROR: ", error);
-            });
-    }
     // console.log(myAppObj.gameMode)
 
-    if (myAppObj.gameMode === singlePlayerMode) { loadSinglePlayer(); }
+    if (myAppObj.gameMode === singlePlayerMode) { loadSinglePlayerGame(); }
     else if (myAppObj.gameMode === doublePlayerMode) { loadMultiPlayerGame(); }
     else console.log("no game, to load,")
 }
@@ -189,6 +228,7 @@ function send1CheeseCheat() {
         });
 }
 function sendShowAll() {
+    console.log("sendShowAll called")
     axios.post('/api/games/' + myAppObj.game.gameNumber + "/cheatstate", "SHOW_ALL", plainTextConfig)
         .then(function (response) {
             console.log("Cheat returned: ", response);

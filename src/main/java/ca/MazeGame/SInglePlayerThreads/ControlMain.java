@@ -25,15 +25,15 @@ public class ControlMain extends MoveUtility {
 
 
     public void move(String newMove) {
-        if (newMove.equals("MOVE_CATS")) {
-            moveLock.lock();
-
-            singleUserGame.moveCat();
-            doWonOrLost();
-
-            moveLock.unlock();
-            return;
-        }
+//        if (newMove.equals("MOVE_CATS")) {
+//            moveLock.lock();
+//
+//            singleUserGame.moveCat();
+//            checkGameWonOrLost();
+//
+//            moveLock.unlock();
+//            return;
+//        }
         moveLock.lock();
 
         doPlayerMove(newMove);
@@ -53,12 +53,12 @@ public class ControlMain extends MoveUtility {
             singleUserGame.recordPlayerMove(move);
             if (!gameNotWonOrLost()) {
 //                System.out.println("Cats won!");
-                doWonOrLost();
+                checkGameWonOrLost();
             }
         }
     }
 
-    public void doWonOrLost() {
+    public void checkGameWonOrLost() {
 //        System.out.println("called");
         if (singleUserGame.hasUserWon()) {
             revealBoard();
